@@ -1,0 +1,25 @@
+{
+    "171028930692775936": {
+        "round1": [
+            "vegas",
+            "kings",
+            "kraken",
+            "stars",
+            "bruins",
+            "leafs",
+            "canes",
+            "devils"
+        ],
+        "round2": [
+            "vegas",
+            "stars",
+            "leafs",
+            "canes"
+        ],
+        "round3": [
+            "vegas",
+            "canes"
+        ],
+        "round4": "vegas"
+    }
+}
