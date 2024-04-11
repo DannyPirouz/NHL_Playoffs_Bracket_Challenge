@@ -8,3 +8,10 @@ Manually tallying up points was also tedious and could lead to errors. I noticed
 Given the 16 teams that make playoffs, users can create their entire bracket all the way to the Stanley Cup winner. 
 I also introduced a points system and points will be awarded based on the correctness of each round. The later rounds earn more points as they are harder to predict. 
 Users can view their predictions as well as display their brackets with simple commands. User data gets saved and once the first match of the playoffs starts, predictions can no longer be made.
+
+
+To run the bot on your server:
+1. Paste in your bot token in the like this: client.login('Your Token')
+2. run npm install discord.js
+3. run npm install
+4. run the server with node src/index.js
