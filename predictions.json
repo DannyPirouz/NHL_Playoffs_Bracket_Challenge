@@ -1,25 +1,60 @@
 {
     "171028930692775936": {
         "round1": [
-            "vegas",
-            "kings",
-            "kraken",
-            "stars",
-            "bruins",
-            "leafs",
-            "canes",
-            "devils"
+            "Dallas",
+            "Avs",
+            "Canucks",
+            "Oilers",
+            "Panthers",
+            "Leafs",
+            "Rangers",
+            "Canes"
         ],
         "round2": [
-            "vegas",
-            "stars",
-            "leafs",
-            "canes"
+            "Avs",
+            "Oilers",
+            "Leafs",
+            "Rangers"
         ],
         "round3": [
-            "vegas",
-            "canes"
+            "Avs",
+            "Rangers"
         ],
-        "round4": "vegas"
+        "round4": "Avs"
+    },
+    "121077080178819074": {
+        "round1": [
+            "Jets",
+            "Kings",
+            "Avs",
+            "Stars",
+            "Panthers",
+            "Leafs",
+            "Canes",
+            "Rangers"
+        ],
+        "round2": [
+            "Kings",
+            "Stars",
+            "Panthers",
+            "Canes"
+        ],
+        "round3": [
+            "Stars",
+            "Canes"
+        ],
+        "round4": "Stars"
+    },
+    "188862231470014466": {
+        "round1": [
+            "Dallas",
+            "Avs",
+            "Canucks",
+            "Oilers",
+            "Panthers",
+            "Leafs",
+            "Rangers",
+            "Canes"
+        ]
     }
 }

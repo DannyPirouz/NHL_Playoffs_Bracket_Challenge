@@ -20,12 +20,11 @@ client.once('ready', () => {
 
 const prefix = '!';
 
-const round1Matchups = [['Vegas', 'Jets'], ['Oilers', 'Kings'], ['Avs', 'Kraken'], ['Stars', 'Wild'],
-['Bruins', 'Panthers'], ['Leafs', 'Lightning'], ['Canes', 'Islanders'], ['Devils', 'Rangers']];
+const round1Matchups = [['Dallas', 'Vegas'], ['Jets', 'Avs'], ['Canucks', 'Preds'], ['Oilers', 'Kings'],
+['Panthers', 'Lightning'], ['Bruins', 'Leafs'], ['Rangers', 'Capitals'], ['Canes', 'Islanders']];
 const round2Matchups = [];
 const round3Matchups = [];
 const round4Matchups = [];
-
 
 let predictions = {};
 try {
@@ -53,13 +52,13 @@ client.on('messageCreate', message => {
 
     if (command === 'predictround1') {
 
-        const currentDate = new Date();
-        const endDate = new Date('April 21, 2024');
+        // const currentDate = new Date();
+        // const endDate = new Date('April 21, 2024');
 
-        if (currentDate > endDate) {
-            message.reply('The deadline for predicting has passed.');
-            return;
-        }
+        // if (currentDate > endDate) {
+        //     message.reply('The deadline for predicting has passed.');
+        //     return;
+        // }
 
         if (args.length !== 8) {
             message.reply('Please provide predictions for all matchups in Round 1.');
@@ -74,7 +73,7 @@ client.on('messageCreate', message => {
 
     if (command === 'start') {
         message.reply(`The Round 1 matchups are: 
-                                                ${round1Matchups[0][0]} vs ${round1Matchups[0][1]} 
+                                                 ${round1Matchups[0][0]} vs ${round1Matchups[0][1]} 
                                                  ${round1Matchups[1][0]} vs ${round1Matchups[1][1]} 
                                                  ${round1Matchups[2][0]} vs ${round1Matchups[2][1]} 
                                                  ${round1Matchups[3][0]} vs ${round1Matchups[3][1]} 
@@ -83,7 +82,7 @@ client.on('messageCreate', message => {
                                                  ${round1Matchups[6][0]} vs ${round1Matchups[6][1]} 
                                                  ${round1Matchups[7][0]} vs ${round1Matchups[7][1]} \n
                                                  Use commands \"!predictRound1\" \"!predictRound2\" \"!predictRound3\" and \"!predictWinner\" to make predictions \n
-                                                 Enter in answers like this: \"!predictRound1 Vegas Oilers Avs Stars Bruins Leafs Canes Devils \n
+                                                 Enter in answers like this: \"!predictRound1 Vegas Jets Preds Kings Lightning Leafs Rangers Canes \n
                                                  Use the command \"!myPredictions\" to see your predictions.
                                                  Use the command \"!display\" to display your bracket.
                                                  Use the command \"!points\" to see how many points you have.`);
@@ -97,62 +96,65 @@ client.on('messageCreate', message => {
     }
 
     if (command === 'points') {
+
         let round1Points = 0;
         let round2Points = 0;
         let round3Points = 0;
         let round4Points = 0;
         let totalPoints = 0;
         const userPrediction = predictions[message.author.id];
+
         if (userPrediction.round1) {
-            if (userPrediction.round1.includes("vegas")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("oilers")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("kraken")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("stars")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("panthers")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("leafs")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("canes")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
-            if (userPrediction.round1.includes("devils")) {
+            if (userPrediction.round1.includes("null")) {
                 round1Points++;
             }
         }
+
         if (userPrediction.round2) {
-            if (userPrediction.round2.includes("vegas")) {
+            if (userPrediction.round2.includes("null")) {
                 round2Points += 2;
             }
-            if (userPrediction.round2.includes("stars")) {
+            if (userPrediction.round2.includes("null")) {
                 round2Points += 2;
             }
-            if (userPrediction.round2.includes("panthers")) {
+            if (userPrediction.round2.includes("null")) {
                 round2Points += 2;
             }
-            if (userPrediction.round2.includes("canes")) {
+            if (userPrediction.round2.includes("null")) {
                 round2Points += 2;
             }
         }
         if (userPrediction.round3) {
-            if (userPrediction.round3.includes("vegas")) {
+            if (userPrediction.round3.includes("null")) {
                 round3Points += 3;
             }
-            if (userPrediction.round3.includes("panthers")) {
+            if (userPrediction.round3.includes("null")) {
                 round3Points += 3;
             }
         }
         if (userPrediction.round4) {
-            if (userPrediction.round4.includes("vegas")) {
+            if (userPrediction.round4.includes("null")) {
                 round4Points += 5;
             }
         }
@@ -165,15 +167,16 @@ client.on('messageCreate', message => {
         Your total points are: ${totalPoints}`);
     }
 
+
     if (command === 'predictround2') {
 
-        const currentDate = new Date();
-        const endDate = new Date('April 21, 2024');
+        // const currentDate = new Date();
+        // const endDate = new Date('April 21, 2024');
 
-        if (currentDate > endDate) {
-            message.reply('The deadline for predicting has passed.');
-            return;
-        }
+        // if (currentDate > endDate) {
+        //     message.reply('The deadline for predicting has passed.');
+        //     return;
+        // }
 
         const userPrediction = predictions[message.author.id];
         if (!userPrediction || !userPrediction.round1) {
@@ -201,13 +204,13 @@ client.on('messageCreate', message => {
 
     if (command === 'predictround3') {
 
-        const currentDate = new Date();
-        const endDate = new Date('April 21, 2024');
+        // const currentDate = new Date();
+        // const endDate = new Date('April 21, 2024');
 
-        if (currentDate > endDate) {
-            message.reply('The deadline for predicting has passed.');
-            return;
-        }
+        // if (currentDate > endDate) {
+        //     message.reply('The deadline for predicting has passed.');
+        //     return;
+        // }
 
         const userPrediction = predictions[message.author.id];
         if (!userPrediction || !userPrediction.round1 || !userPrediction.round2) {
@@ -231,13 +234,13 @@ client.on('messageCreate', message => {
 
     if (command === 'predictwinner') {
 
-        const currentDate = new Date();
-        const endDate = new Date('April 21, 2024');
+        // const currentDate = new Date();
+        // const endDate = new Date('April 21, 2024');
 
-        if (currentDate > endDate) {
-            message.reply('The deadline for predicting has passed.');
-            return;
-        }
+        // if (currentDate > endDate) {
+        //     message.reply('The deadline for predicting has passed.');
+        //     return;
+        // }
 
         const userPrediction = predictions[message.author.id];
         if (!userPrediction || !userPrediction.round1 || !userPrediction.round2 || !userPrediction.round3) {
@@ -266,14 +269,14 @@ client.on('messageCreate', message => {
         }
         let response = 'Your predictions for Round 1: \n' +
             `\`\`\`yaml\n` +
-            `Vegas vs Jets      : ${userPrediction.round1[0].toUpperCase()}\n` +
-            `Oilers vs Kings    : ${userPrediction.round1[1].toUpperCase()}\n` +
-            `Avs vs Kraken      : ${userPrediction.round1[2].toUpperCase()}\n` +
-            `Stars vs Wild      : ${userPrediction.round1[3].toUpperCase()}\n` +
-            `Bruins vs Panthers : ${userPrediction.round1[4].toUpperCase()}\n` +
-            `Lightning vs Leafs : ${userPrediction.round1[5].toUpperCase()}\n` +
-            `Canes vs Islanders : ${userPrediction.round1[6].toUpperCase()}\n` +
-            `Rangers vs Devils  : ${userPrediction.round1[7].toUpperCase()}\n` +
+            `Dallas vs Vegas        : ${userPrediction.round1[0].toUpperCase()}\n` +
+            `Jets vs Avs            : ${userPrediction.round1[1].toUpperCase()}\n` +
+            `Canucks vs Preds       : ${userPrediction.round1[2].toUpperCase()}\n` +
+            `Oilers vs Kings        : ${userPrediction.round1[3].toUpperCase()}\n` +
+            `Panthers vs Lightning  : ${userPrediction.round1[4].toUpperCase()}\n` +
+            `Bruins vs Leafs        : ${userPrediction.round1[5].toUpperCase()}\n` +
+            `Rangers vs Capitals    : ${userPrediction.round1[6].toUpperCase()}\n` +
+            `Canes vs Islanders     : ${userPrediction.round1[7].toUpperCase()}\n` +
             `\`\`\``;
 
         if (userPrediction.round2) {
@@ -311,26 +314,26 @@ client.on('messageCreate', message => {
         let response1 =
             `Your Bracket:
 
-            Vegas ------                                                                                                                                                                    ------ Bruins
+            Dallas ------                                                                                                                                                                    ------ Panthers
                                 ${userPrediction.round1[0].toUpperCase()} ------                                                                                                                  ------ ${userPrediction.round1[4].toUpperCase()} 
-            Jets  ------                                                                                                                                                                    ------ Panthers
+            Vegas  ------                                                                                                                                                                    ------ Lightning
                                                     ${userPrediction.round2[0].toUpperCase()} ----                                                                                    ---- ${userPrediction.round2[2].toUpperCase()} 
-            Oilers -----                                                                                                                                                                    ------ Leafs
+            Jets -----                                                                                                                                                                    ------ Bruins
                                 ${userPrediction.round1[1].toUpperCase()} ------                                                                                                                  ------ ${userPrediction.round1[5].toUpperCase()} 
-            Kings ------                                                                                                                                                                    ------ Lightning
+            Avs ------                                                                                                                                                                    ------ Leafs
                                                                             ${userPrediction.round3[0].toUpperCase()}    -------    ${userPrediction.round4.toUpperCase()}    -------    ${userPrediction.round3[1].toUpperCase()}
 
             `;
 
         let response2 =
             `!
-            Avs --------                                                                                                                                                                    ------ Canes
+            Canucks --------                                                                                                                                                                    ------ Rangers
                                 ${userPrediction.round1[2].toUpperCase()} ------                                                                                                                  ------ ${userPrediction.round1[6].toUpperCase()} 
-            Kraken -----                                                                                                                                                                    ------ Islanders
+            Preds -----                                                                                                                                                                    ------ Capitals
                                                     ${userPrediction.round2[1].toUpperCase()} ----                                                                                    ---- ${userPrediction.round2[3].toUpperCase()} 
-            Stars ------                                                                                                                                                                    ------ Rangers
+            Oilers ------                                                                                                                                                                    ------ Canes
                                 ${userPrediction.round1[3].toUpperCase()} ------                                                                                                                    ------ ${userPrediction.round1[7].toUpperCase()} 
-            Wild -------                                                                                                                                                                    ------ Devils
+            Kings -------                                                                                                                                                                    ------ Islanders
 
 
 
