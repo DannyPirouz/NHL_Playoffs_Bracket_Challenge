@@ -104,47 +104,27 @@ client.on('messageCreate', message => {
         let totalPoints = 0;
         const userPrediction = predictions[message.author.id];
 
+
+        const teamsR1 = ["Rangers", "Panthers", "Canes", "Oilers", "Avs", "Canucks", "Bruins", "Dallas", "Stars"];
+
         if (userPrediction.round1) {
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
-            if (userPrediction.round1.includes("null")) {
-                round1Points++;
-            }
+            teamsR1.forEach(team => {
+                if (userPrediction.round1.includes(team)) {
+                    round1Points++;
+                }
+            });
         }
 
+        const teamsR2 = ["null", "null", "null", "null"];
+
         if (userPrediction.round2) {
-            if (userPrediction.round2.includes("null")) {
-                round2Points += 2;
-            }
-            if (userPrediction.round2.includes("null")) {
-                round2Points += 2;
-            }
-            if (userPrediction.round2.includes("null")) {
-                round2Points += 2;
-            }
-            if (userPrediction.round2.includes("null")) {
-                round2Points += 2;
-            }
+            teamsR2.forEach(team => {
+                if (userPrediction.round2.includes(team)) {
+                    round2Points += 2;
+                }
+            });
         }
+
         if (userPrediction.round3) {
             if (userPrediction.round3.includes("null")) {
                 round3Points += 3;
@@ -158,6 +138,7 @@ client.on('messageCreate', message => {
                 round4Points += 5;
             }
         }
+        
         totalPoints = round1Points + round2Points + round3Points + round4Points;
         message.reply(`Points:
         Your Round 1 points are: ${round1Points} \n 

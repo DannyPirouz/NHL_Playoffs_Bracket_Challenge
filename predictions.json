@@ -24,24 +24,24 @@
     },
     "121077080178819074": {
         "round1": [
-            "Jets",
-            "Kings",
-            "Avs",
             "Stars",
+            "Jets",
+            "Canucks",
+            "Oilers",
             "Panthers",
-            "Leafs",
-            "Canes",
-            "Rangers"
+            "Bruins",
+            "Rangers",
+            "Canes"
         ],
         "round2": [
-            "Kings",
             "Stars",
+            "Oilers",
             "Panthers",
             "Canes"
         ],
         "round3": [
             "Stars",
-            "Canes"
+            "Panthers"
         ],
         "round4": "Stars"
     },
@@ -55,6 +55,40 @@
             "Leafs",
             "Rangers",
             "Canes"
-        ]
+        ],
+        "round2": [
+            "Dallas",
+            "Canucks",
+            "Panthers",
+            "Rangers"
+        ],
+        "round3": [
+            "Canucks",
+            "Rangers"
+        ],
+        "round4": "Canucks"
+    },
+    "433498523221360640": {
+        "round1": [
+            "Vegas",
+            "Avs",
+            "Canucks",
+            "Oilers",
+            "Panthers",
+            "Bruins",
+            "Rangers",
+            "Canes"
+        ],
+        "round2": [
+            "Avs",
+            "Canucks",
+            "Panthers",
+            "Rangers"
+        ],
+        "round3": [
+            "Canucks",
+            "Rangers"
+        ],
+        "round4": "Canucks"
     }
 }
