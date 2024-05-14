@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { Client, IntentsBitField, MessageEmbed } = require('discord.js');
-const fs = require('fs');
+const { MongoClient } = require('mongodb');
 
 const client = new Client({
     intents: [
@@ -13,6 +13,21 @@ const client = new Client({
         IntentsBitField.Flags.MessageContent,
     ],
 });
+
+const uri = 'mongodb://localhost:27017';
+const clientMongo = new MongoClient(uri);
+
+async function connectToMongoDB() {
+    try {
+        await clientMongo.connect();
+        console.log('Connected to MongoDB');
+        await loadPredictions();
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+    }
+}
+
+connectToMongoDB();
 
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -27,21 +42,33 @@ const round3Matchups = [];
 const round4Matchups = [];
 
 let predictions = {};
-try {
-    const data = fs.readFileSync('./predictions.json');
-    if (data.length > 0) {
-        predictions = JSON.parse(data);
+
+async function loadPredictions() {
+    const database = clientMongo.db('NHLBracket');
+    const collection = database.collection('predictions');
+
+    try {
+        const predictionData = await collection.findOne({ _id: 'predictions' });
+        if (predictionData) {
+            predictions = predictionData.predictions;
+            console.log('Predictions loaded from MongoDB');
+        }
+    } catch (error) {
+        console.error('Error loading predictions from MongoDB:', error);
     }
-} catch (error) {
-    console.log('Error loading predictions:', error);
 }
 
-function savePredictions() {
-    fs.writeFile('./predictions.json', JSON.stringify(predictions, null, 4), (err) => {
-        if (err) console.error('Error saving predictions:', err);
-    });
-}
+async function savePredictions() {
+    const database = clientMongo.db('NHLBracket');
+    const collection = database.collection('predictions');
 
+    try {
+        await collection.updateOne({ _id: 'predictions' }, { $set: { predictions } }, { upsert: true });
+        console.log('Predictions saved to MongoDB');
+    } catch (error) {
+        console.error('Error saving predictions to MongoDB:', error);
+    }
+}
 
 client.on('messageCreate', message => {
     if (message.author.bot || !message.content.startsWith(prefix)) {
@@ -97,13 +124,19 @@ client.on('messageCreate', message => {
 
     if (command === 'points') {
 
+        const userPrediction = predictions[message.author.id];
+
+        if (!userPrediction || !userPrediction.round1) {
+            message.reply('You have not made any predictions yet.');
+            return;
+        }
+
         let round1Points = 0;
         let round2Points = 0;
         let round3Points = 0;
         let round4Points = 0;
         let totalPoints = 0;
-        const userPrediction = predictions[message.author.id];
-
+        
 
         const teamsR1 = ["Rangers", "Panthers", "Canes", "Oilers", "Avs", "Canucks", "Bruins", "Dallas", "Stars"];
 
@@ -138,7 +171,7 @@ client.on('messageCreate', message => {
                 round4Points += 5;
             }
         }
-        
+
         totalPoints = round1Points + round2Points + round3Points + round4Points;
         message.reply(`Points:
         Your Round 1 points are: ${round1Points} \n 
@@ -147,7 +180,7 @@ client.on('messageCreate', message => {
         Your Round 4 points are: ${round4Points} \n 
         Your total points are: ${totalPoints}`);
     }
-
+    
 
     if (command === 'predictround2') {
 
@@ -291,7 +324,6 @@ client.on('messageCreate', message => {
             return;
         }
 
-
         let response1 =
             `Your Bracket:
 
@@ -322,12 +354,9 @@ client.on('messageCreate', message => {
 
         message.reply(response1);
         message.reply(response2);
-
     }
-
 });
 
 client.login(process.env.TOKEN);
-
 
 
