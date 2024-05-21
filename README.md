@@ -14,4 +14,5 @@ To run the bot on your server:
 1. Paste in your bot token in the like this: client.login('Your Token')
 2. run "npm install" 
 3. run "npm install discord.js"
-4. run the server with "node src/index.js"
+4. run "npm install mongodb"
+5. run the server with "node src/index.js"
