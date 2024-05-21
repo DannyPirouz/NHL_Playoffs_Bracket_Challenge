@@ -148,7 +148,7 @@ client.on('messageCreate', message => {
             });
         }
 
-        const teamsR2 = ["null", "null", "null", "null"];
+        const teamsR2 = ["Panthers", "Rangers", "Dallas", "Oilers"];
 
         if (userPrediction.round2) {
             teamsR2.forEach(team => {
