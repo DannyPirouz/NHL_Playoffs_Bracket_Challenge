@@ -6,7 +6,6 @@ const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings',
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
 
 async function generateBracketImage(predictions, userId, fullRound1Matchups) {
-  console.log(`[DEBUG] Generating bracket for ${userId}:`, JSON.stringify(predictions, null, 2));
 
   const westernDefaults = [];
 const easternDefaults = [];
@@ -79,7 +78,6 @@ if (predictions.round1 && predictions.round1.length > 0) {
   fs.writeFileSync(htmlPath, htmlContent);
   
   const fileUrl = `file://${htmlPath.replace(/\\/g, '/')}`;
-  console.log(`[DEBUG] Created bracket HTML at: ${fileUrl}`);
   
   const browser = await puppeteer.launch({
     headless: true,
