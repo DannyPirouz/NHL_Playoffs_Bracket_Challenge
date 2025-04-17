@@ -15,4 +15,7 @@ To run the bot on your server:
 2. run "npm install" 
 3. run "npm install discord.js"
 4. run "npm install mongodb"
-5. run the server with "node src/index.js"
+5. run "npm install -g serve"
+6. run the bracket-renderer with serve bracket-renderer/. if in root directory
+6. run the server with "node src/index.js"
+
