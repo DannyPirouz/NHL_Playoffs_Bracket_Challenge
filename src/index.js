@@ -326,7 +326,7 @@ async function display(message) {
             const image = new AttachmentBuilder(imagePath);
 
             await sentMesage.delete();
-            await message.reply({ content: 'Here’s your bracket! 🧊', files: [image] });
+            await message.reply({ content: 'Here’s your bracket! 🤫', files: [image] });
         } catch (err) {
             console.error(err);
             message.reply('Failed to generate bracket image.');
