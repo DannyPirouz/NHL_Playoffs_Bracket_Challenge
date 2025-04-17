@@ -253,30 +253,30 @@ client.on('messageCreate', async message => {
         }
         let response = 'Your predictions for Round 1: \n' +
             `\`\`\`yaml\n` +
-            `Jets vs Blues        : ${userPrediction.round1[0].toUpperCase()}\n` +
-            `Stars vs Avs            : ${userPrediction.round1[1].toUpperCase()}\n` +
-            `Vegas vs Wild       : ${userPrediction.round1[2].toUpperCase()}\n` +
-            `Kings vs Oilers        : ${userPrediction.round1[3].toUpperCase()}\n` +
-            `Leafs vs Sens  : ${userPrediction.round1[4].toUpperCase()}\n` +
-            `Tampa vs Panthers        : ${userPrediction.round1[5].toUpperCase()}\n` +
-            `Caps vs Habs    : ${userPrediction.round1[6].toUpperCase()}\n` +
-            `Canes vs Devils     : ${userPrediction.round1[7].toUpperCase()}\n` +
+            `Jets vs Blues      : ${userPrediction.round1[0].toUpperCase()}\n` +
+            `Stars vs Avs       : ${userPrediction.round1[1].toUpperCase()}\n` +
+            `Vegas vs Wild      : ${userPrediction.round1[2].toUpperCase()}\n` +
+            `Kings vs Oilers    : ${userPrediction.round1[3].toUpperCase()}\n` +
+            `Leafs vs Sens      : ${userPrediction.round1[4].toUpperCase()}\n` +
+            `Tampa vs Panthers  : ${userPrediction.round1[5].toUpperCase()}\n` +
+            `Caps vs Habs       : ${userPrediction.round1[6].toUpperCase()}\n` +
+            `Canes vs Devils    : ${userPrediction.round1[7].toUpperCase()}\n` +
             `\`\`\``;
 
         if (userPrediction.round2) {
             response += 'Your predictions for Round 2: \n' +
                 `\`\`\`yaml\n` +
-                `${userPrediction.round1[0]} vs ${userPrediction.round1[1]} : ${userPrediction.round2[0].toUpperCase()}\n` +
-                `${userPrediction.round1[2]} vs ${userPrediction.round1[3]} : ${userPrediction.round2[1].toUpperCase()}\n` +
-                `${userPrediction.round1[4]} vs ${userPrediction.round1[5]} : ${userPrediction.round2[2].toUpperCase()}\n` +
-                `${userPrediction.round1[6]} vs ${userPrediction.round1[7]} : ${userPrediction.round2[3].toUpperCase()}\n` +
+                `${userPrediction.round1[0]} vs ${userPrediction.round1[1]}        : ${userPrediction.round2[0].toUpperCase()}\n` +
+                `${userPrediction.round1[2]} vs ${userPrediction.round1[3]}     : ${userPrediction.round2[1].toUpperCase()}\n` +
+                `${userPrediction.round1[4]} vs ${userPrediction.round1[5]}   : ${userPrediction.round2[2].toUpperCase()}\n` +
+                `${userPrediction.round1[6]} vs ${userPrediction.round1[7]}      : ${userPrediction.round2[3].toUpperCase()}\n` +
                 `\`\`\``;
         }
         if (userPrediction.round3) {
             response += 'Your predictions for Round 3: \n' +
                 `\`\`\`yaml\n` +
-                `${userPrediction.round2[0]} vs ${userPrediction.round2[1]} : ${userPrediction.round3[0].toUpperCase()}\n` +
-                `${userPrediction.round2[2]} vs ${userPrediction.round2[3]} : ${userPrediction.round3[1].toUpperCase()}\n` +
+                `${userPrediction.round2[0]} vs ${userPrediction.round2[1]}   : ${userPrediction.round3[0].toUpperCase()}\n` +
+                `${userPrediction.round2[2]} vs ${userPrediction.round2[3]}   : ${userPrediction.round3[1].toUpperCase()}\n` +
                 `\`\`\``;
         }
         if (userPrediction.round4) {
