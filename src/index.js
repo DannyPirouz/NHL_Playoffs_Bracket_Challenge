@@ -1,6 +1,10 @@
 require('dotenv').config();
-const { Client, IntentsBitField, MessageEmbed } = require('discord.js');
+const { Client, IntentsBitField, EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require('discord.js');
 const { MongoClient } = require('mongodb');
+const generateBracketImage = require('../screenshotBracket');
+const { AttachmentBuilder } = require('discord.js');
+
 
 const client = new Client({
     intents: [
@@ -35,8 +39,8 @@ client.once('ready', () => {
 
 const prefix = '!';
 
-const round1Matchups = [['Dallas', 'Vegas'], ['Jets', 'Avs'], ['Canucks', 'Preds'], ['Oilers', 'Kings'],
-['Panthers', 'Lightning'], ['Bruins', 'Leafs'], ['Rangers', 'Capitals'], ['Canes', 'Islanders']];
+const round1Matchups = [['Jets', 'Blues'], ['Stars', 'Avs'], ['Vegas', 'Wild'], ['Kings', 'Oilers'],
+['Leafs', 'Sens'], ['Tampa', 'Panthers'], ['Caps', 'Habs'], ['Canes', 'Devils']];
 const round2Matchups = [];
 const round3Matchups = [];
 const round4Matchups = [];
@@ -70,33 +74,93 @@ async function savePredictions() {
     }
 }
 
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
     if (message.author.bot || !message.content.startsWith(prefix)) {
         return;
     }
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-
-    if (command === 'predictround1') {
-
-        // const currentDate = new Date();
-        // const endDate = new Date('April 21, 2024');
-
-        // if (currentDate > endDate) {
-        //     message.reply('The deadline for predicting has passed.');
-        //     return;
-        // }
-
-        if (args.length !== 8) {
-            message.reply('Please provide predictions for all matchups in Round 1.');
-            return;
-        }
-
-        const winners = args;
-        predictions[message.author.id] = { round1: winners };
-        savePredictions();
-        message.reply('Round 1 predictions recorded successfully!');
+    
+    if (command === 'predict') {
+        const userId = message.author.id;
+        predictions[userId] = { round1: [], round2: [], round3: [], round4: null };
+    
+        let round = 1;
+        let matchupIndex = 0;
+        let currentMatchups = [...round1Matchups];
+    
+        const sendNextMatchup = () => {
+            if (matchupIndex >= currentMatchups.length) {
+                if (round === 1) predictions[userId].round1 = [...picks];
+                else if (round === 2) predictions[userId].round2 = [...picks];
+                else if (round === 3) predictions[userId].round3 = [...picks];
+                else if (round === 4) {
+                    predictions[userId].round4 = picks[0];
+                    savePredictions();
+                    message.channel.send(`🏆 All rounds complete! Your Stanley Cup Winner is **${picks[0]}**!`);
+                    return;
+                }
+    
+                round++;
+                matchupIndex = 0;
+                currentMatchups = [];
+    
+                for (let i = 0; i < picks.length; i += 2) {
+                    currentMatchups.push([picks[i], picks[i + 1]]);
+                }
+    
+                if (round === 4) {
+                    currentMatchups = [[picks[0], picks[1]]];
+                }
+    
+                picks = [];
+                message.channel.send(`➡️ Moving to Round ${round}...`);
+                setTimeout(sendNextMatchup, 1500);
+                return;
+            }
+    
+            const [teamA, teamB] = currentMatchups[matchupIndex];
+            const row = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`pick_${teamA}_${userId}`)
+                        .setLabel(teamA)
+                        .setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder()
+                        .setCustomId(`pick_${teamB}_${userId}`)
+                        .setLabel(teamB)
+                        .setStyle(ButtonStyle.Danger)
+                );
+    
+            message.channel.send({
+                content: `Round ${round} — Matchup ${matchupIndex + 1}: **${teamA}** vs **${teamB}**`,
+                components: [row]
+            });
+    
+            matchupIndex++;
+        };
+    
+        let picks = [];
+    
+        const collector = message.channel.createMessageComponentCollector({
+            filter: interaction => interaction.customId.startsWith('pick_') && interaction.customId.endsWith(userId),
+            time: 600000 
+        });
+    
+        collector.on('collect', async interaction => {
+            const [, pickedTeam] = interaction.customId.split('_');
+            picks.push(pickedTeam);
+            await interaction.reply({ content: `✅ You picked **${pickedTeam}**!`, ephemeral: true });
+            sendNextMatchup();
+        });
+    
+        collector.on('end', () => {
+            console.log('Prediction session ended or timed out.');
+        });
+    
+        sendNextMatchup();
     }
+    
 
     if (command === 'start') {
         message.reply(`The Round 1 matchups are: 
@@ -138,7 +202,7 @@ client.on('messageCreate', message => {
         let totalPoints = 0;
         
 
-        const teamsR1 = ["Rangers", "Panthers", "Canes", "Oilers", "Avs", "Canucks", "Bruins", "Dallas", "Stars"];
+        const teamsR1 = ["null", "null", "null", "null", "null", "null", "null", "null", "null"];
 
         if (userPrediction.round1) {
             teamsR1.forEach(team => {
@@ -148,7 +212,7 @@ client.on('messageCreate', message => {
             });
         }
 
-        const teamsR2 = ["Panthers", "Rangers", "Dallas", "Oilers"];
+        const teamsR2 = ["null", "null", "null", "null"];
 
         if (userPrediction.round2) {
             teamsR2.forEach(team => {
@@ -180,100 +244,6 @@ client.on('messageCreate', message => {
         Your Round 4 points are: ${round4Points} \n 
         Your total points are: ${totalPoints}`);
     }
-    
-
-    if (command === 'predictround2') {
-
-        // const currentDate = new Date();
-        // const endDate = new Date('April 21, 2024');
-
-        // if (currentDate > endDate) {
-        //     message.reply('The deadline for predicting has passed.');
-        //     return;
-        // }
-
-        const userPrediction = predictions[message.author.id];
-        if (!userPrediction || !userPrediction.round1) {
-            message.reply('You must make predictions for Round 1 before predicting for Round 2.');
-            return;
-        }
-
-        round2Matchups.push([userPrediction.round1[0], userPrediction.round1[1]]);
-        round2Matchups.push([userPrediction.round1[2], userPrediction.round1[3]]);
-        round2Matchups.push([userPrediction.round1[4], userPrediction.round1[5]]);
-        round2Matchups.push([userPrediction.round1[6], userPrediction.round1[7]]);
-
-
-        if (args.length !== 4) {
-            message.reply('Please provide predictions for all matchups in Round 2.');
-            return;
-        }
-        const round2Winners = args;
-
-        predictions[message.author.id].round2 = round2Winners;
-        savePredictions();
-        message.reply('Round 2 predictions recorded successfully!');
-    }
-
-
-    if (command === 'predictround3') {
-
-        // const currentDate = new Date();
-        // const endDate = new Date('April 21, 2024');
-
-        // if (currentDate > endDate) {
-        //     message.reply('The deadline for predicting has passed.');
-        //     return;
-        // }
-
-        const userPrediction = predictions[message.author.id];
-        if (!userPrediction || !userPrediction.round1 || !userPrediction.round2) {
-            message.reply('You must make predictions for both Rounds 1 and 2 before predicting for Round 3.');
-            return;
-        }
-
-        round3Matchups.push([userPrediction.round2[0], userPrediction.round2[1]]);
-        round3Matchups.push([userPrediction.round2[2], userPrediction.round2[3]]);
-
-        if (args.length !== 2) {
-            message.reply('Please provide predictions for both matchups in Round 3.');
-            return;
-        }
-        const round3Winners = args;
-
-        predictions[message.author.id].round3 = round3Winners;
-        savePredictions();
-        message.reply('Round 3 predictions recorded successfully!');
-    }
-
-    if (command === 'predictwinner') {
-
-        // const currentDate = new Date();
-        // const endDate = new Date('April 21, 2024');
-
-        // if (currentDate > endDate) {
-        //     message.reply('The deadline for predicting has passed.');
-        //     return;
-        // }
-
-        const userPrediction = predictions[message.author.id];
-        if (!userPrediction || !userPrediction.round1 || !userPrediction.round2 || !userPrediction.round3) {
-            message.reply('You must make predictions for all three rounds before predicting the Stanley Cup Winner.');
-            return;
-        }
-
-        round4Matchups.push(userPrediction.round3);
-
-        if (args.length !== 1) {
-            message.reply('Please provide a Stanley Cup Winner');
-            return;
-        }
-        const [winnerRound4] = args;
-
-        predictions[message.author.id].round4 = winnerRound4;
-        savePredictions();
-        message.reply('Stanley Cup Winner recorded successfully!');
-    }
 
     if (command === 'mypredictions') {
         const userPrediction = predictions[message.author.id];
@@ -283,14 +253,14 @@ client.on('messageCreate', message => {
         }
         let response = 'Your predictions for Round 1: \n' +
             `\`\`\`yaml\n` +
-            `Dallas vs Vegas        : ${userPrediction.round1[0].toUpperCase()}\n` +
-            `Jets vs Avs            : ${userPrediction.round1[1].toUpperCase()}\n` +
-            `Canucks vs Preds       : ${userPrediction.round1[2].toUpperCase()}\n` +
-            `Oilers vs Kings        : ${userPrediction.round1[3].toUpperCase()}\n` +
-            `Panthers vs Lightning  : ${userPrediction.round1[4].toUpperCase()}\n` +
-            `Bruins vs Leafs        : ${userPrediction.round1[5].toUpperCase()}\n` +
-            `Rangers vs Capitals    : ${userPrediction.round1[6].toUpperCase()}\n` +
-            `Canes vs Islanders     : ${userPrediction.round1[7].toUpperCase()}\n` +
+            `Jets vs Blues        : ${userPrediction.round1[0].toUpperCase()}\n` +
+            `Stars vs Avs            : ${userPrediction.round1[1].toUpperCase()}\n` +
+            `Vegas vs Wild       : ${userPrediction.round1[2].toUpperCase()}\n` +
+            `Kings vs Oilers        : ${userPrediction.round1[3].toUpperCase()}\n` +
+            `Leafs vs Sens  : ${userPrediction.round1[4].toUpperCase()}\n` +
+            `Tampa vs Panthers        : ${userPrediction.round1[5].toUpperCase()}\n` +
+            `Caps vs Habs    : ${userPrediction.round1[6].toUpperCase()}\n` +
+            `Canes vs Devils     : ${userPrediction.round1[7].toUpperCase()}\n` +
             `\`\`\``;
 
         if (userPrediction.round2) {
@@ -319,42 +289,22 @@ client.on('messageCreate', message => {
 
     if (command === 'display') {
         const userPrediction = predictions[message.author.id];
-        if (!userPrediction || !userPrediction.round1 || !userPrediction.round2 || !userPrediction.round3 || !userPrediction.round4) {
+        if (!userPrediction?.round1 || !userPrediction?.round2 || !userPrediction?.round3 || !userPrediction?.round4) {
             message.reply('You must make predictions for all rounds before displaying your bracket.');
             return;
         }
-
-        let response1 =
-            `Your Bracket:
-
-            Dallas ------                                                                                                                                                                    ------ Panthers
-                                ${userPrediction.round1[0].toUpperCase()} ------                                                                                                                  ------ ${userPrediction.round1[4].toUpperCase()} 
-            Vegas  ------                                                                                                                                                                    ------ Lightning
-                                                    ${userPrediction.round2[0].toUpperCase()} ----                                                                                    ---- ${userPrediction.round2[2].toUpperCase()} 
-            Jets -----                                                                                                                                                                    ------ Bruins
-                                ${userPrediction.round1[1].toUpperCase()} ------                                                                                                                  ------ ${userPrediction.round1[5].toUpperCase()} 
-            Avs ------                                                                                                                                                                    ------ Leafs
-                                                                            ${userPrediction.round3[0].toUpperCase()}    -------    ${userPrediction.round4.toUpperCase()}    -------    ${userPrediction.round3[1].toUpperCase()}
-
-            `;
-
-        let response2 =
-            `!
-            Canucks --------                                                                                                                                                                    ------ Rangers
-                                ${userPrediction.round1[2].toUpperCase()} ------                                                                                                                  ------ ${userPrediction.round1[6].toUpperCase()} 
-            Preds -----                                                                                                                                                                    ------ Capitals
-                                                    ${userPrediction.round2[1].toUpperCase()} ----                                                                                    ---- ${userPrediction.round2[3].toUpperCase()} 
-            Oilers ------                                                                                                                                                                    ------ Canes
-                                ${userPrediction.round1[3].toUpperCase()} ------                                                                                                                    ------ ${userPrediction.round1[7].toUpperCase()} 
-            Kings -------                                                                                                                                                                    ------ Islanders
-
-
-
-            `;
-
-        message.reply(response1);
-        message.reply(response2);
+    
+        try {
+            const imagePath = await generateBracketImage(userPrediction, message.author.id, round1Matchups);
+            const image = new AttachmentBuilder(imagePath);
+            message.reply({ content: 'Here’s your bracket! 🧊', files: [image] });
+        } catch (err) {
+            console.error(err);
+            message.reply('Failed to generate bracket image.');
+        }
     }
+    
+    
 });
 
 client.login(process.env.TOKEN);

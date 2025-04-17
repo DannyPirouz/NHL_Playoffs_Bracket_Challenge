@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NHL Bracket</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      padding: 2rem;
+    }
+    .round {
+      margin-bottom: 2rem;
+      border-left: 4px solid #0066cc;
+      padding-left: 1rem;
+    }
+    .round h2 {
+      color: #0066cc;
+      margin-bottom: 1rem;
+    }
+    .matchup {
+      background: white;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-weight: bold;
+    }
+    .winner {
+      background: #ffd700;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    #debug-info {
+      background: #eee;
+      padding: 1rem;
+      margin-top: 2rem;
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>NHL Playoff Bracket</h1>
+  
+  <div class="round" id="round1">
+    <h2>Round 1</h2>
+  </div>
+  
+  <div class="round" id="round2">
+    <h2>Round 2</h2>
+  </div>
+  
+  <div class="round" id="round3">
+    <h2>Round 3</h2>
+  </div>
+  
+  <div class="round" id="round4">
+    <h2>Stanley Cup Winner</h2>
+  </div>
+  
+  <div id="debug-info"></div>
+
+  <script>
+    function showDebugInfo(message) {
+      const debugDiv = document.getElementById('debug-info');
+      debugDiv.innerHTML += message + '\n';
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    showDebugInfo('URL Parameters: ' + urlParams.toString());
+    
+    function processRound(roundName) {
+      const param = urlParams.get(roundName);
+      showDebugInfo(`${roundName} param: ${param}`);
+      
+      if (param) {
+        const teams = decodeURIComponent(param).split(',');
+        showDebugInfo(`${roundName} teams: ${JSON.stringify(teams)}`);
+        
+        const roundDiv = document.getElementById(roundName);
+        
+        if (roundName !== 'round4') {
+          for (let i = 0; i < teams.length; i += 2) {
+            const matchup = document.createElement('div');
+            matchup.className = 'matchup';
+            matchup.textContent = `${teams[i]} vs ${teams[i + 1] || '???'}`;
+            roundDiv.appendChild(matchup);
+          }
+        } 
+        else {
+          const winnerDiv = document.createElement('div');
+          winnerDiv.className = 'winner';
+          winnerDiv.textContent = `🏆 ${teams}`;
+          roundDiv.appendChild(winnerDiv);
+        }
+      }
+    }
+    
+    processRound('round1');
+    processRound('round2');
+    processRound('round3');
+    processRound('round4');
+  </script>
+</body>
+</html>

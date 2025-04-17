@@ -11,9 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.18.0",
     "dotenv": "^16.4.5",
-    "mongodb": "^6.6.1",
-    "nodemon": "^3.1.0"
+    "mongodb": "^6.15.0",
+    "nodemon": "^3.1.0",
+    "puppeteer": "^24.6.1"
   }
 }
