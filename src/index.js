@@ -162,21 +162,12 @@ client.on('messageCreate', async message => {
     }
     
 
-    if (command === 'start') {
-        message.reply(`The Round 1 matchups are: 
-                                                 ${round1Matchups[0][0]} vs ${round1Matchups[0][1]} 
-                                                 ${round1Matchups[1][0]} vs ${round1Matchups[1][1]} 
-                                                 ${round1Matchups[2][0]} vs ${round1Matchups[2][1]} 
-                                                 ${round1Matchups[3][0]} vs ${round1Matchups[3][1]} 
-                                                 ${round1Matchups[4][0]} vs ${round1Matchups[4][1]} 
-                                                 ${round1Matchups[5][0]} vs ${round1Matchups[5][1]} 
-                                                 ${round1Matchups[6][0]} vs ${round1Matchups[6][1]} 
-                                                 ${round1Matchups[7][0]} vs ${round1Matchups[7][1]} \n
-                                                 Use commands \"!predictRound1\" \"!predictRound2\" \"!predictRound3\" and \"!predictWinner\" to make predictions \n
-                                                 Enter in answers like this: \"!predictRound1 Vegas Jets Preds Kings Lightning Leafs Rangers Canes \n
-                                                 Use the command \"!myPredictions\" to see your predictions.
-                                                 Use the command \"!display\" to display your bracket.
-                                                 Use the command \"!points\" to see how many points you have.`);
+    if (command === 'help') {
+        message.reply(`Commands: 
+                        Use the command \"!predict\" to make predictions.
+                        Use the command \"!myPredictions\" to see your predictions.
+                        Use the command \"!display\" to display your bracket.
+                        Use the command \"!points\" to see how many points you have.`);
     }
 
     if (command === 'clearit') {
