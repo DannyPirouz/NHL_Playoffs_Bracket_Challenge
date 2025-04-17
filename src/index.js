@@ -84,6 +84,7 @@ client.on('messageCreate', async message => {
     const command = args.shift().toLowerCase();
     
     if (command === 'predict') {
+        let botMessages = [];
         const userId = message.author.id;
         predictions[userId] = { round1: [], round2: [], round3: [], round4: null };
     
@@ -99,8 +100,16 @@ client.on('messageCreate', async message => {
                 else if (round === 4) {
                     predictions[userId].round4 = picks[0];
                     savePredictions();
-                    message.channel.send(`🏆 All rounds complete! Your Stanley Cup Winner is **${picks[0]}**!`);
+                    const finalMsg = await message.channel.send(`🏆 All rounds complete! Your Stanley Cup Winner is **${picks[0]}**!`);
+                    botMessages.push(finalMsg);
                     await display(message);
+                    for (const msg of botMessages) {
+                        try {
+                            await msg.delete();
+                        } catch (err) {
+                            console.warn('Failed to delete message:', err.message);
+                        }
+                    }                    
                     return;
                 }
     
@@ -117,7 +126,10 @@ client.on('messageCreate', async message => {
                 }
     
                 picks = [];
-                message.channel.send(`➡️ Moving to Round ${round}...`);
+                message.channel.send(`➡️ Moving to Round ${round}...`)
+                    .then(msg => botMessages.push(msg))
+                    .catch(console.error);
+
                 setTimeout(sendNextMatchup, 1500);
                 return;
             }
@@ -138,7 +150,8 @@ client.on('messageCreate', async message => {
             message.channel.send({
                 content: `Round ${round} — Matchup ${matchupIndex + 1}: **${teamA}** vs **${teamB}**`,
                 components: [row]
-            });
+            }).then(msg => botMessages.push(msg)).catch(console.error);
+                
     
             matchupIndex++;
         };
@@ -159,7 +172,13 @@ client.on('messageCreate', async message => {
         collector.on('collect', async interaction => {
             const [, pickedTeam] = interaction.customId.split('_');
             picks.push(pickedTeam);
-            await interaction.reply({ content: `✅ You picked **${pickedTeam}**!`, flags: MessageFlags.Ephemeral });
+            // await interaction.reply({ content: `✅ You picked **${pickedTeam}**!`, flags: MessageFlags.Ephemeral });
+            try {
+                await interaction.deferUpdate(); // no ephemeral message clutter
+            } catch (err) {
+                console.warn('Failed to defer interaction:', err.message);
+            }
+            
             sendNextMatchup();
         });
     
