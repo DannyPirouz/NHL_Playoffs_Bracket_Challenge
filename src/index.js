@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, IntentsBitField, EmbedBuilder } = require('discord.js');
+const { Client, IntentsBitField, EmbedBuilder, MessageFlags } = require('discord.js');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require('discord.js');
 const { MongoClient } = require('mongodb');
 const generateBracketImage = require('../screenshotBracket');
@@ -20,6 +20,8 @@ const client = new Client({
 
 const uri = 'mongodb://localhost:27017';
 const clientMongo = new MongoClient(uri);
+
+const activeCollectors = new Map();
 
 async function connectToMongoDB() {
     try {
@@ -89,7 +91,7 @@ client.on('messageCreate', async message => {
         let matchupIndex = 0;
         let currentMatchups = [...round1Matchups];
     
-        const sendNextMatchup = () => {
+        const sendNextMatchup = async () => {
             if (matchupIndex >= currentMatchups.length) {
                 if (round === 1) predictions[userId].round1 = [...picks];
                 else if (round === 2) predictions[userId].round2 = [...picks];
@@ -98,6 +100,7 @@ client.on('messageCreate', async message => {
                     predictions[userId].round4 = picks[0];
                     savePredictions();
                     message.channel.send(`🏆 All rounds complete! Your Stanley Cup Winner is **${picks[0]}**!`);
+                    await display(message);
                     return;
                 }
     
@@ -141,21 +144,28 @@ client.on('messageCreate', async message => {
         };
     
         let picks = [];
+
+        if (activeCollectors.has(userId)) {
+            activeCollectors.get(userId).stop('new prediction started');
+        }
     
         const collector = message.channel.createMessageComponentCollector({
             filter: interaction => interaction.customId.startsWith('pick_') && interaction.customId.endsWith(userId),
             time: 600000 
         });
+
+        activeCollectors.set(userId, collector);
     
         collector.on('collect', async interaction => {
             const [, pickedTeam] = interaction.customId.split('_');
             picks.push(pickedTeam);
-            await interaction.reply({ content: `✅ You picked **${pickedTeam}**!`, ephemeral: true });
+            await interaction.reply({ content: `✅ You picked **${pickedTeam}**!`, flags: MessageFlags.Ephemeral });
             sendNextMatchup();
         });
     
         collector.on('end', () => {
             console.log('Prediction session ended or timed out.');
+            activeCollectors.delete(userId);
         });
     
         sendNextMatchup();
@@ -193,7 +203,7 @@ client.on('messageCreate', async message => {
         let totalPoints = 0;
         
 
-        const teamsR1 = ["null", "null", "null", "null", "null", "null", "null", "null", "null"];
+        const teamsR1 = ["null", "null", "null", "null", "null", "null", "null", "null"];
 
         if (userPrediction.round1) {
             teamsR1.forEach(team => {
@@ -215,15 +225,15 @@ client.on('messageCreate', async message => {
 
         if (userPrediction.round3) {
             if (userPrediction.round3.includes("null")) {
-                round3Points += 3;
+                round3Points += 4;
             }
             if (userPrediction.round3.includes("null")) {
-                round3Points += 3;
+                round3Points += 4;
             }
         }
         if (userPrediction.round4) {
             if (userPrediction.round4.includes("null")) {
-                round4Points += 5;
+                round4Points += 8;
             }
         }
 
@@ -279,24 +289,30 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'display') {
-        const userPrediction = predictions[message.author.id];
+        display(message);
+    }
+    
+});
+
+async function display(message) {
+    const userPrediction = predictions[message.author.id];
         if (!userPrediction?.round1 || !userPrediction?.round2 || !userPrediction?.round3 || !userPrediction?.round4) {
             message.reply('You must make predictions for all rounds before displaying your bracket.');
             return;
         }
+        const sentMesage = await message.reply('Generating your bracket...');
     
         try {
             const imagePath = await generateBracketImage(userPrediction, message.author.id, round1Matchups);
             const image = new AttachmentBuilder(imagePath);
-            message.reply({ content: 'Here’s your bracket! 🧊', files: [image] });
+
+            await sentMesage.delete();
+            await message.reply({ content: 'Here’s your bracket! 🧊', files: [image] });
         } catch (err) {
             console.error(err);
             message.reply('Failed to generate bracket image.');
         }
-    }
-    
-    
-});
+}
 
 client.login(process.env.TOKEN);
 
