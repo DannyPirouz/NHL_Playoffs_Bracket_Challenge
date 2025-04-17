@@ -174,7 +174,7 @@ client.on('messageCreate', async message => {
             picks.push(pickedTeam);
             // await interaction.reply({ content: `✅ You picked **${pickedTeam}**!`, flags: MessageFlags.Ephemeral });
             try {
-                await interaction.deferUpdate(); // no ephemeral message clutter
+                await interaction.deferUpdate(); 
             } catch (err) {
                 console.warn('Failed to defer interaction:', err.message);
             }

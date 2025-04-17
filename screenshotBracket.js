@@ -5,6 +5,25 @@ const path = require('path');
 const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings', 'Oilers'];
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
 
+const teamLogos = {
+  'Jets': 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg',
+  'Blues': 'https://assets.nhle.com/logos/nhl/svg/STL_light.svg',
+  'Stars': 'https://assets.nhle.com/logos/nhl/svg/DAL_light.svg',
+  'Avs': 'https://assets.nhle.com/logos/nhl/svg/COL_light.svg',
+  'Vegas': 'https://assets.nhle.com/logos/nhl/svg/VGK_light.svg',
+  'Wild': 'https://assets.nhle.com/logos/nhl/svg/MIN_light.svg',
+  'Kings': 'https://assets.nhle.com/logos/nhl/svg/LAK_light.svg',
+  'Oilers': 'https://assets.nhle.com/logos/nhl/svg/EDM_light.svg',
+  'Leafs': 'https://assets.nhle.com/logos/nhl/svg/TOR_light.svg',
+  'Sens': 'https://assets.nhle.com/logos/nhl/svg/OTT_light.svg',
+  'Tampa': 'https://assets.nhle.com/logos/nhl/svg/TBL_light.svg',
+  'Panthers': 'https://assets.nhle.com/logos/nhl/svg/FLA_light.svg',
+  'Caps': 'https://assets.nhle.com/logos/nhl/svg/WSH_light.svg',
+  'Habs': 'https://assets.nhle.com/logos/nhl/svg/MTL_light.svg',
+  'Canes': 'https://assets.nhle.com/logos/nhl/svg/CAR_light.svg',
+  'Devils': 'https://assets.nhle.com/logos/nhl/svg/NJD_light.svg'
+};
+
 async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   const westernMatchups = fullRound1Matchups.filter(([a]) => westernTeams.includes(a));
   const easternMatchups = fullRound1Matchups.filter(([a]) => easternTeams.includes(a));
@@ -31,6 +50,9 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1200, height: 900 });
+    
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+    
     await page.goto(fileUrl, { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 1000));
     const screenshotPath = path.join(__dirname, `bracket-${userId}.png`);
@@ -42,6 +64,18 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
 }
 
 function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, eastR3, winner) {
+  let winnerHTML = '';
+  if (winner) {
+    const logoPath = teamLogos[winner] || null;
+    winnerHTML = `
+      <div class="winner">
+        <div class="trophy">🏆</div>
+        ${logoPath ? `<div class="logo-container"><img src="${logoPath}" alt="${winner} logo" class="team-logo"></div>` : ''}
+        <div class="winner-name">${winner}</div>
+      </div>
+    `;
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,28 +84,40 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
+      background: #0a2351; /* Dark blue background */
+      color: white;
+      padding: 0;
       margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .page-container {
+      padding: 40px 20px;
     }
     .bracket-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
     .conference {
       width: 45%;
     }
     .conference-title {
       text-align: center;
-      color: #0066cc;
+      color: #4a9bff;
       margin-bottom: 20px;
       font-size: 24px;
       font-weight: bold;
-      border-bottom: 2px solid #0066cc;
-      padding-bottom: 5px;
+      border-bottom: 2px solid #4a9bff;
+      padding-bottom: 8px;
     }
     .bracket {
       display: flex;
@@ -85,23 +131,26 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     .round-title {
       font-weight: bold;
       text-align: center;
-      margin-bottom: 10px;
-      color: #333;
+      margin-bottom: 12px;
+      color: #d4e5ff;
     }
     .matchups {
       display: flex;
       flex-direction: column;
     }
     .matchup {
-      background: white;
-      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
       margin: 5px 0;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       font-size: 14px;
+      border-left: 3px solid #4a9bff;
     }
     .east-round .matchup {
       text-align: right;
+      border-left: none;
+      border-right: 3px solid #4a9bff;
     }
     .west-round {
       align-items: flex-start;
@@ -117,51 +166,83 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       align-items: center;
     }
     .winner {
-      background: #ffd700;
+      background: linear-gradient(to bottom, #ffd700, #e6c200);
+      color: #333;
       padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       font-weight: bold;
       font-size: 18px;
       text-align: center;
       margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .trophy {
       font-size: 40px;
       margin-bottom: 10px;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .logo-container {
+      width: 80px;
+      height: 80px;
+      margin: 5px 0 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .team-logo {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .winner-name {
+      font-size: 18px;
+      font-weight: bold;
     }
     h1 {
       text-align: center;
-      color: #333;
+      color: white;
       margin-bottom: 30px;
+      font-size: 36px;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .vs {
+      color: #ffd700;
+      font-weight: normal;
+      font-style: italic;
+      margin: 0 4px;
     }
   </style>
 </head>
 <body>
-  <h1>NHL Playoff Bracket</h1>
-  <div class="bracket-container">
-    <div class="conference">
-      <div class="conference-title">Western Conference</div>
-      <div class="bracket">
-        <div class="round west-round"><div class="round-title">Matchups</div><div class="matchups">${generateMatchupsFromPairs(westM)}</div></div>
-        <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateMatchups(westR1)}</div></div>
-        <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateMatchups(westR2)}</div></div>
-        <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateMatchups(westR3)}</div></div>
+  <div class="page-container">
+    <h1>NHL Playoff Bracket</h1>
+    <div class="bracket-container">
+      <div class="conference">
+        <div class="conference-title">Western Conference</div>
+        <div class="bracket">
+          <div class="round west-round"><div class="round-title">Matchups</div><div class="matchups">${generateMatchupsFromPairs(westM)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateMatchups(westR1)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateMatchups(westR2)}</div></div>
+          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateMatchups(westR3)}</div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="final-round">
-      <div class="round-title">Stanley Cup Final</div>
-      ${winner ? `<div class="winner"><div class="trophy">🏆</div>${winner}</div>` : ''}
-    </div>
+      <div class="final-round">
+        <div class="round-title">Stanley Cup Final</div>
+        ${winnerHTML}
+      </div>
 
-    <div class="conference">
-      <div class="conference-title">Eastern Conference</div>
-      <div class="bracket" style="flex-direction: row-reverse;">
-        <div class="round east-round"><div class="round-title">Matchups</div><div class="matchups">${generateMatchupsFromPairs(eastM)}</div></div>
-        <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateMatchups(eastR1)}</div></div>
-        <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateMatchups(eastR2)}</div></div>
-        <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateMatchups(eastR3)}</div></div>
+      <div class="conference">
+        <div class="conference-title">Eastern Conference</div>
+        <div class="bracket" style="flex-direction: row-reverse;">
+          <div class="round east-round"><div class="round-title">Matchups</div><div class="matchups">${generateMatchupsFromPairs(eastM)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateMatchups(eastR1)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateMatchups(eastR2)}</div></div>
+          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateMatchups(eastR3)}</div></div>
+        </div>
       </div>
     </div>
   </div>
