@@ -109,6 +109,8 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     }
     .conference {
       width: 45%;
+      display: flex;
+      flex-direction: column;
     }
     .conference-title {
       text-align: center;
@@ -122,11 +124,15 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     .bracket {
       display: flex;
       justify-content: space-between;
+      flex-grow: 1;
+      height: 500px; /* Fixed height for the bracket */
     }
     .round {
       display: flex;
       flex-direction: column;
       width: 23%;
+      position: relative;
+      height: 100%;
     }
     .round-title {
       font-weight: bold;
@@ -137,11 +143,13 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     .matchups {
       display: flex;
       flex-direction: column;
+      justify-content: space-around; /* Evenly distribute matchups */
+      height: calc(100% - 40px); /* Adjust for round title height */
+      padding: 10px 0;
     }
     .matchup {
       background: rgba(255, 255, 255, 0.1);
       padding: 10px 12px;
-      margin: 5px 0;
       border-radius: 6px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       font-size: 14px;
@@ -180,7 +188,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       align-items: center;
     }
     .trophy {
-      font-size: 40px;
+      font-size: 60px;
       margin-bottom: 10px;
       text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
@@ -198,7 +206,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       object-fit: contain;
     }
     .winner-name {
-      font-size: 18px;
+      font-size: 25px;
       font-weight: bold;
     }
     h1 {
@@ -218,7 +226,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
 </head>
 <body>
   <div class="page-container">
-    <h1>NHL Playoff Bracket</h1>
+    <h1>🏒 NHL Playoff Bracket 🏒</h1>
     <div class="bracket-container">
       <div class="conference">
         <div class="conference-title">Western Conference</div>
