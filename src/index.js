@@ -43,9 +43,6 @@ const prefix = '!';
 
 const round1Matchups = [['Jets', 'Blues'], ['Stars', 'Avs'], ['Vegas', 'Wild'], ['Kings', 'Oilers'],
 ['Leafs', 'Sens'], ['Tampa', 'Panthers'], ['Caps', 'Habs'], ['Canes', 'Devils']];
-const round2Matchups = [];
-const round3Matchups = [];
-const round4Matchups = [];
 
 let predictions = {};
 
@@ -74,6 +71,66 @@ async function savePredictions() {
     } catch (error) {
         console.error('Error saving predictions to MongoDB:', error);
     }
+}
+
+function calculateUserPoints(userPrediction) {
+    if (!userPrediction || !userPrediction.round1) {
+        return {
+            round1Points: 0,
+            round2Points: 0,
+            round3Points: 0,
+            round4Points: 0,
+            totalPoints: 0
+        };
+    }
+
+    const round1Winners = ["null", "null", "null", "null", "null", "null", "null", "null"];
+    const round2Winners = ["null", "null", "null", "null"];
+    const round3Winners = ["null", "null"];
+    const finalWinner = "null";
+    
+    let round1Points = 0;
+    let round2Points = 0;
+    let round3Points = 0;
+    let round4Points = 0;
+    
+    if (userPrediction.round1) {
+        userPrediction.round1.forEach(team => {
+            if (round1Winners.includes(team)) {
+                round1Points++;
+            }
+        });
+    }
+    
+    if (userPrediction.round2) {
+        userPrediction.round2.forEach(team => {
+            if (round2Winners.includes(team)) {
+                round2Points += 2;
+            }
+        });
+    }
+    
+    if (userPrediction.round3) {
+        userPrediction.round3.forEach(team => {
+            if (round3Winners.includes(team)) {
+                round3Points += 4;
+            }
+        });
+    }
+    
+    if (userPrediction.round4 === finalWinner) {
+        round4Points = 8;
+    }
+    
+    const totalPoints = round1Points + round2Points + round3Points + round4Points;
+    
+    return {
+        round1Points,
+        round2Points,
+        round3Points,
+        round4Points,
+        totalPoints
+    };
 }
 
 client.on('messageCreate', async message => {
@@ -199,70 +256,123 @@ client.on('messageCreate', async message => {
                         Use the command \"!points\" to see how many points you have.`);
     }
 
+    if (command === 'points') {
+        const userPrediction = predictions[message.author.id];
+    
+        if (!userPrediction || !userPrediction.round1) {
+            message.reply('You have not made any predictions yet.');
+            return;
+        }
+    
+        const pointsData = calculateUserPoints(userPrediction);
+    
+        message.reply(`Points:
+        Your Round 1 points are: ${pointsData.round1Points} \n 
+        Your Round 2 points are: ${pointsData.round2Points} \n 
+        Your Round 3 points are: ${pointsData.round3Points} \n 
+        Your Round 4 points are: ${pointsData.round4Points} \n 
+        Your total points are: ${pointsData.totalPoints}`);
+    }
+
+    if (command === 'leaderboard') {
+        const getLeaderboard = async () => {
+            const leaderboardData = [];
+            const userPromises = [];
+            
+            for (const [userId, userPrediction] of Object.entries(predictions)) {
+                if (!userPrediction || !userPrediction.round1) continue;
+                
+                const pointsData = calculateUserPoints(userPrediction);
+                let user = client.users.cache.get(userId);
+                
+                if (!user) {
+                    userPromises.push(
+                        client.users.fetch(userId)
+                            .then(fetchedUser => {
+                                leaderboardData.push({
+                                    username: fetchedUser.username,
+                                    userId,
+                                    ...pointsData
+                                });
+                            })
+                            .catch(() => {
+                                leaderboardData.push({
+                                    username: `Unknown User`,
+                                    userId,
+                                    ...pointsData
+                                });
+                            })
+                    );
+                } else {
+                    leaderboardData.push({
+                        username: user.username,
+                        userId,
+                        ...pointsData
+                    });
+                }
+            }
+            
+            if (userPromises.length > 0) {
+                await Promise.all(userPromises);
+            }
+            
+            leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints);
+            
+            const embed = new EmbedBuilder()
+                .setColor('#0099ff')
+                .setTitle('🏆 NHL Bracket Challenge Leaderboard')
+                .setDescription('Current Standings for the NHL Bracket Challenge')
+                .setTimestamp()
+                .setFooter({ text: 'Use !points to see your detailed points breakdown' });
+            
+            const topUsers = leaderboardData.slice(0, 15);
+            
+            if (topUsers.length === 0) {
+                embed.addFields({ name: 'No predictions', value: 'No users have made predictions yet!' });
+            } else {
+                let leaderboardText = '';
+                
+                topUsers.forEach((userData, index) => {
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                    leaderboardText += `${medal} **${userData.username}**: ${userData.totalPoints} pts ` +
+                        `(R1: ${userData.round1Points}, R2: ${userData.round2Points}, ` +
+                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})\n`;
+                });
+                
+                embed.addFields({ name: 'Rankings', value: leaderboardText });
+            }
+            
+            const currentUserIndex = leaderboardData.findIndex(data => data.userId === message.author.id);
+            
+            if (currentUserIndex !== -1 && currentUserIndex >= 10) {
+                const userData = leaderboardData[currentUserIndex];
+                embed.addFields({ 
+                    name: 'Your Position', 
+                    value: `#${currentUserIndex + 1}: **${userData.username}**: ${userData.totalPoints} pts ` +
+                          `(R1: ${userData.round1Points}, R2: ${userData.round2Points}, ` +
+                          `R3: ${userData.round3Points}, Final: ${userData.round4Points})`
+                });
+            }
+            
+            return embed;
+        };
+    
+        message.channel.send('Generating leaderboard 🤫...').then(async msg => {
+            try {
+                const embed = await getLeaderboard();
+                await msg.edit({ content: null, embeds: [embed] });
+            } catch (error) {
+                console.error('Error generating leaderboard:', error);
+                msg.edit('Error generating leaderboard. Please try again later.');
+            }
+        });
+    }
+
     if (command === 'clearit') {
 
         delete predictions[message.author.id];
         savePredictions();
         message.reply('Predictions cleared successfully!');
-    }
-
-    if (command === 'points') {
-
-        const userPrediction = predictions[message.author.id];
-
-        if (!userPrediction || !userPrediction.round1) {
-            message.reply('You have not made any predictions yet.');
-            return;
-        }
-
-        let round1Points = 0;
-        let round2Points = 0;
-        let round3Points = 0;
-        let round4Points = 0;
-        let totalPoints = 0;
-        
-
-        const teamsR1 = ["null", "null", "null", "null", "null", "null", "null", "null"];
-
-        if (userPrediction.round1) {
-            teamsR1.forEach(team => {
-                if (userPrediction.round1.includes(team)) {
-                    round1Points++;
-                }
-            });
-        }
-
-        const teamsR2 = ["null", "null", "null", "null"];
-
-        if (userPrediction.round2) {
-            teamsR2.forEach(team => {
-                if (userPrediction.round2.includes(team)) {
-                    round2Points += 2;
-                }
-            });
-        }
-
-        if (userPrediction.round3) {
-            if (userPrediction.round3.includes("null")) {
-                round3Points += 4;
-            }
-            if (userPrediction.round3.includes("null")) {
-                round3Points += 4;
-            }
-        }
-        if (userPrediction.round4) {
-            if (userPrediction.round4.includes("null")) {
-                round4Points += 8;
-            }
-        }
-
-        totalPoints = round1Points + round2Points + round3Points + round4Points;
-        message.reply(`Points:
-        Your Round 1 points are: ${round1Points} \n 
-        Your Round 2 points are: ${round2Points} \n 
-        Your Round 3 points are: ${round3Points} \n 
-        Your Round 4 points are: ${round4Points} \n 
-        Your total points are: ${totalPoints}`);
     }
 
     if (command === 'mypredictions') {
