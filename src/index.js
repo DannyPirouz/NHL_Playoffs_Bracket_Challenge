@@ -246,6 +246,50 @@ client.on('messageCreate', async message => {
     
         sendNextMatchup();
     }
+
+    if (command === 'bracket') {
+        const targetUsername = args.join(' ');
+        
+        if (!targetUsername) {
+            message.reply('Please provide a username. Usage: !bracket username');
+            return;
+        }
+        
+        let targetUserId = null;
+        const predictionEntries = Object.entries(predictions);
+        
+        for (const [userId] of predictionEntries) {
+            try {
+                const user = await client.users.fetch(userId);
+                if (user && user.username.toLowerCase() === targetUsername.toLowerCase()) {
+                    targetUserId = userId;
+                    break;
+                }
+            } catch (error) {
+                console.warn(`Could not fetch user with ID ${userId}: ${error.message}`);
+            }
+        }
+        
+        if (!targetUserId) {
+            message.reply(`Could not find a bracket for user "${targetUsername}". Make sure the username is spelled correctly.`);
+            return;
+        }
+        
+        const userPrediction = predictions[targetUserId];
+        
+        const loadingMessage = await message.reply(`Generating ${targetUsername}'s bracket...`);
+        
+        try {
+            const imagePath = await generateBracketImage(userPrediction, targetUserId, round1Matchups);
+            const image = new AttachmentBuilder(imagePath);
+            
+            await loadingMessage.delete();
+            await message.reply({ content: `Here's ${targetUsername}'s bracket! 🤫`, files: [image] });
+        } catch (err) {
+            console.error(err);
+            await loadingMessage.edit(`Failed to generate bracket image for ${targetUsername}.`);
+        }
+    }
     
 
     if (command === 'help') {
@@ -275,23 +319,27 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'leaderboard') {
+        const paidUsers = ['darrell99', 'jrg', 'supsoup', 'tobi.36', 'stevechoi', 'canucksfan233']
         const getLeaderboard = async () => {
             const leaderboardData = [];
             const userPromises = [];
             
             for (const [userId, userPrediction] of Object.entries(predictions)) {
                 if (!userPrediction || !userPrediction.round1) continue;
-                
+                // console.log(userPrediction);
                 const pointsData = calculateUserPoints(userPrediction);
                 let user = client.users.cache.get(userId);
+                let userChampionPick = userPrediction.round4;
                 
                 if (!user) {
                     userPromises.push(
                         client.users.fetch(userId)
                             .then(fetchedUser => {
+                                // console.log(fetchedUser);
                                 leaderboardData.push({
                                     username: fetchedUser.username,
                                     userId,
+                                    userChampionPick,
                                     ...pointsData
                                 });
                             })
@@ -299,14 +347,17 @@ client.on('messageCreate', async message => {
                                 leaderboardData.push({
                                     username: `Unknown User`,
                                     userId,
+                                    userChampionPick,
                                     ...pointsData
                                 });
                             })
                     );
                 } else {
+                    // console.log(user);
                     leaderboardData.push({
                         username: user.username,
                         userId,
+                        userChampionPick,
                         ...pointsData
                     });
                 }
@@ -325,7 +376,7 @@ client.on('messageCreate', async message => {
                 .setTimestamp()
                 .setFooter({ text: 'Use !points to see your detailed points breakdown' });
             
-            const topUsers = leaderboardData.slice(0, 15);
+            const topUsers = leaderboardData.slice(0, 20);
             
             if (topUsers.length === 0) {
                 embed.addFields({ name: 'No predictions', value: 'No users have made predictions yet!' });
@@ -333,10 +384,17 @@ client.on('messageCreate', async message => {
                 let leaderboardText = '';
                 
                 topUsers.forEach((userData, index) => {
+                    let paidMedal;
                     const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-                    leaderboardText += `${medal} **${userData.username}**: ${userData.totalPoints} pts ` +
+                    if (paidUsers.includes(userData.username)) {
+                        paidMedal = '🤑 ';
+                    } else {
+                        paidMedal = '❌ ';
+                    }
+                
+                    leaderboardText += `${paidMedal}` + `${medal} **${userData.username}**: **${userData.totalPoints} pts** ` +
                         `(R1: ${userData.round1Points}, R2: ${userData.round2Points}, ` +
-                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})\n`;
+                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})   ` + `Champ Pick: **${userData.userChampionPick.toUpperCase()}** \n` + '\n';
                 });
                 
                 embed.addFields({ name: 'Rankings', value: leaderboardText });
@@ -367,6 +425,11 @@ client.on('messageCreate', async message => {
             }
         });
     }
+    
+
+    // if (command === 'update') { 
+    //     message.reply('@everyone Greetings Predictors! I have been updated! Please refresh your image with !display. Use !releasenotes to see the latest changes.');
+    // }
 
     if (command === 'clearit') {
 
