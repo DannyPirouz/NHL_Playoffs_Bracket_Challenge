@@ -149,14 +149,22 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     }
     .matchup {
       background: rgba(255, 255, 255, 0.1);
-      padding: 10px 12px;
+      padding: 12px;
       border-radius: 6px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       font-size: 14px;
       border-left: 3px solid #4a9bff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .team {
+      padding: 5px 0;
+      font-weight: bold;
+      width: 100%;
     }
     .east-round .matchup {
-      text-align: right;
       border-left: none;
       border-right: 3px solid #4a9bff;
     }
@@ -220,7 +228,8 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       color: #ffd700;
       font-weight: normal;
       font-style: italic;
-      margin: 0 4px;
+      margin: 8px 0;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -231,10 +240,10 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       <div class="conference">
         <div class="conference-title">Western Conference</div>
         <div class="bracket">
-          <div class="round west-round"><div class="round-title">Matchups</div><div class="matchups">${generateMatchupsFromPairs(westM)}</div></div>
-          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateMatchups(westR1)}</div></div>
-          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateMatchups(westR2)}</div></div>
-          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateMatchups(westR3)}</div></div>
+          <div class="round west-round"><div class="round-title">Matchups</div><div class="matchups">${generateVerticalMatchupsFromPairs(westM)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchups(westR1)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(westR2)}</div></div>
+          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(westR3)}</div></div>
         </div>
       </div>
 
@@ -246,10 +255,10 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       <div class="conference">
         <div class="conference-title">Eastern Conference</div>
         <div class="bracket" style="flex-direction: row-reverse;">
-          <div class="round east-round"><div class="round-title">Matchups</div><div class="matchups">${generateMatchupsFromPairs(eastM)}</div></div>
-          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateMatchups(eastR1)}</div></div>
-          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateMatchups(eastR2)}</div></div>
-          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateMatchups(eastR3)}</div></div>
+          <div class="round east-round"><div class="round-title">Matchups</div><div class="matchups">${generateVerticalMatchupsFromPairs(eastM)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchups(eastR1)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(eastR2)}</div></div>
+          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(eastR3)}</div></div>
         </div>
       </div>
     </div>
@@ -258,20 +267,33 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
 </html>`;
 }
 
-function generateMatchups(teams) {
+function generateVerticalMatchups(teams) {
   let html = '';
   for (let i = 0; i < teams.length; i += 2) {
     if (teams[i + 1]) {
-      html += `<div class="matchup">${teams[i]} <span class="vs">vs</span> ${teams[i + 1]}</div>`;
+      html += `
+        <div class="matchup">
+          <span class="team">${teams[i]}</span>
+          <span class="vs">vs</span>
+          <span class="team">${teams[i + 1]}</span>
+        </div>`;
     } else {
-      html += `<div class="matchup">${teams[i]}</div>`;
+      html += `
+        <div class="matchup">
+          <span class="team">${teams[i]}</span>
+        </div>`;
     }
   }
   return html;
 }
 
-function generateMatchupsFromPairs(pairs) {
-  return pairs.map(([a, b]) => `<div class="matchup">${a} <span class="vs">vs</span> ${b}</div>`).join('');
+function generateVerticalMatchupsFromPairs(pairs) {
+  return pairs.map(([a, b]) => `
+    <div class="matchup">
+      <span class="team">${a}</span>
+      <span class="vs">vs</span>
+      <span class="team">${b}</span>
+    </div>`).join('');
 }
 
 module.exports = generateBracketImage;
