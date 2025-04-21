@@ -297,7 +297,9 @@ client.on('messageCreate', async message => {
                         Use the command \"!predict\" to make predictions.
                         Use the command \"!myPredictions\" to see your predictions.
                         Use the command \"!display\" to display your bracket.
-                        Use the command \"!points\" to see how many points you have.`);
+                        Use the command \"!points\" to see how many points you have.
+                        Use the command \"!bracket\" to see someone else's bracket.
+                        Use the command \"!leaderboard\" to see the leaderboard.`);
     }
 
     if (command === 'points') {
