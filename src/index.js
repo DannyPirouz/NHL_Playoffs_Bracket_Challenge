@@ -141,6 +141,13 @@ client.on('messageCreate', async message => {
     const command = args.shift().toLowerCase();
     
     if (command === 'predict') {
+
+        let currentDate = new Date();
+        if ((currentDate.getMonth() == 3 && currentDate.getDate() >= 19) || currentDate.getMonth() > 3) {
+            message.reply('Predictions are closed!');
+            return;
+        }
+        
         let botMessages = [];
         const userId = message.author.id;
         predictions[userId] = { round1: [], round2: [], round3: [], round4: null };
