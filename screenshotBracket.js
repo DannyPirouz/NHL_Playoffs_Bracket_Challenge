@@ -240,25 +240,25 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       <div class="conference">
         <div class="conference-title">Western Conference</div>
         <div class="bracket">
-          <div class="round west-round"><div class="round-title">Matchups</div><div class="matchups">${generateVerticalMatchupsFromPairs(westM)}</div></div>
-          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchups(westR1)}</div></div>
-          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(westR2)}</div></div>
-          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(westR3)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchupsFromPairs(westM)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(westR1)}</div></div>
+          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(westR2)}</div></div>
+          <div class="round west-round"><div class="round-title">Stanley Cup Final</div><div class="matchups">${generateVerticalMatchups(westR3)}</div></div>
         </div>
       </div>
 
       <div class="final-round">
-        <div class="round-title">Stanley Cup Final</div>
+        <div class="round-title">Stanley Cup Winner</div>
         ${winnerHTML}
       </div>
 
       <div class="conference">
         <div class="conference-title">Eastern Conference</div>
         <div class="bracket" style="flex-direction: row-reverse;">
-          <div class="round east-round"><div class="round-title">Matchups</div><div class="matchups">${generateVerticalMatchupsFromPairs(eastM)}</div></div>
-          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchups(eastR1)}</div></div>
-          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(eastR2)}</div></div>
-          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(eastR3)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchupsFromPairs(eastM)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(eastR1)}</div></div>
+          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(eastR2)}</div></div>
+          <div class="round east-round"><div class="round-title">Stanley Cup Final</div><div class="matchups">${generateVerticalMatchups(eastR3)}</div></div>
         </div>
       </div>
     </div>

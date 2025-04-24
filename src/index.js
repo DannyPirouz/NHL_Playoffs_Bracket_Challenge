@@ -328,7 +328,7 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'leaderboard') {
-        const paidUsers = ['darrell99', 'jrg', 'supsoup', 'tobi.36', 'stevechoi', 'canucksfan233']
+        const paidUsers = ['darrell99', 'jrg', 'supsoup', 'tobi.36', 'stevechoi', 'canucksfan233', 'boby1699', 'b2water', 'stickycoom', 'ripkek', 'chris30000']
         const getLeaderboard = async () => {
             const leaderboardData = [];
             const userPromises = [];
