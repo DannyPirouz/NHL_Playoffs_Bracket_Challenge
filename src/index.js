@@ -84,7 +84,7 @@ function calculateUserPoints(userPrediction) {
         };
     }
 
-    const round1Winners = ["null", "null", "null", "null", "null", "null", "null", "null"];
+    const round1Winners = ["Canes", "Caps", "Panthers", "null", "null", "null", "null", "null"];
     const round2Winners = ["null", "null", "null", "null"];
     const round3Winners = ["null", "null"];
     const finalWinner = "null";
@@ -440,12 +440,12 @@ client.on('messageCreate', async message => {
     //     message.reply('@everyone Greetings Predictors! I have been updated! Please refresh your image with !display. Use !releasenotes to see the latest changes.');
     // }
 
-    if (command === 'clearit') {
+    // if (command === 'clearit') {
 
-        delete predictions[message.author.id];
-        savePredictions();
-        message.reply('Predictions cleared successfully!');
-    }
+    //     delete predictions[message.author.id];
+    //     savePredictions();
+    //     message.reply('Predictions cleared successfully!');
+    // }
 
     if (command === 'mypredictions') {
         const userPrediction = predictions[message.author.id];
