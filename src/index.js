@@ -84,7 +84,7 @@ function calculateUserPoints(userPrediction) {
         };
     }
 
-    const round1Winners = ["Canes", "Caps", "Panthers", "null", "null", "null", "null", "null"];
+    const round1Winners = ["Canes", "Caps", "Panthers", "Leafs", "Vegas", "Oilers", "null", "null"];
     const round2Winners = ["null", "null", "null", "null"];
     const round3Winners = ["null", "null"];
     const finalWinner = "null";
@@ -316,15 +316,58 @@ client.on('messageCreate', async message => {
             message.reply('You have not made any predictions yet.');
             return;
         }
-    
         const pointsData = calculateUserPoints(userPrediction);
-    
-        message.reply(`Points:
-        Your Round 1 points are: ${pointsData.round1Points} \n 
-        Your Round 2 points are: ${pointsData.round2Points} \n 
-        Your Round 3 points are: ${pointsData.round3Points} \n 
-        Your Round 4 points are: ${pointsData.round4Points} \n 
-        Your total points are: ${pointsData.totalPoints}`);
+        const embed = new EmbedBuilder()
+            .setColor('#0099ff')
+            .setTitle(`🏆 NHL Bracket Points - ${message.author.username}`)
+            .setDescription('Here\'s your current points breakdown:')
+            .addFields(
+                { 
+                    name: 'Points by Round', 
+                    value: `🔹 Round 1: **${pointsData.round1Points}** 🔹 Round 2: **${pointsData.round2Points}** 🔹 Round 3: **${pointsData.round3Points}** 🔹 Final: **${pointsData.round4Points}** 🔹`, 
+                    inline: false 
+                },
+                { name: 'Total Points', value: `**${pointsData.totalPoints}**`, inline: false }
+            )
+            .setFooter({ text: 'Use !leaderboard to see how you compare with others' })
+            .setTimestamp();
+        
+        if (userPrediction.round4) {
+            embed.addFields({ 
+                name: 'Your Champion Pick', 
+                value: `**${userPrediction.round4.toUpperCase()}**`, 
+                inline: false 
+            });
+        }
+        
+        let userRank = "Not ranked";
+        const leaderboardData = [];
+        
+        for (const [userId, prediction] of Object.entries(predictions)) {
+            if (!prediction || !prediction.round1) continue;
+            
+            const points = calculateUserPoints(prediction);
+            leaderboardData.push({
+                userId,
+                totalPoints: points.totalPoints
+            });
+        }
+        
+        if (leaderboardData.length > 0) {
+            leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints);
+            const rankIndex = leaderboardData.findIndex(data => data.userId === message.author.id);
+            
+            if (rankIndex !== -1) {
+                userRank = `#${rankIndex + 1} of ${leaderboardData.length}`;
+                embed.addFields({ 
+                    name: 'Your Current Rank', 
+                    value: userRank, 
+                    inline: true 
+                });
+            }
+        }
+        
+        message.reply({ embeds: [embed] });
     }
 
     if (command === 'leaderboard') {
@@ -516,5 +559,3 @@ async function display(message) {
 }
 
 client.login(process.env.TOKEN);
-
-
