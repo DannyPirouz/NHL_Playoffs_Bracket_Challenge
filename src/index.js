@@ -84,7 +84,7 @@ function calculateUserPoints(userPrediction) {
         };
     }
 
-    const round1Winners = ["Canes", "Caps", "Panthers", "Leafs", "Vegas", "Oilers", "null", "null"];
+    const round1Winners = ["Canes", "Caps", "Panthers", "Leafs", "Vegas", "Oilers", "Stars", "Jets"];
     const round2Winners = ["null", "null", "null", "null"];
     const round3Winners = ["null", "null"];
     const finalWinner = "null";
