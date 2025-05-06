@@ -5,6 +5,9 @@ const path = require('path');
 const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings', 'Oilers'];
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
 
+const eliminatedTeams = ['Blues', 'Avs', 'Wild', 'Kings', 'Sens', 'Tampa', 'Habs', 'Devils'];
+const activeTeams = ['Jets', 'Stars', 'Vegas', 'Oilers', 'Leafs', 'Panthers', 'Caps', 'Canes'];
+
 const teamLogos = {
   'Jets': 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg',
   'Blues': 'https://assets.nhle.com/logos/nhl/svg/STL_light.svg',
@@ -164,6 +167,14 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       font-weight: bold;
       width: 100%;
     }
+    .team.eliminated {
+      color: #ff4d4d; 
+      text-decoration: line-through;
+      opacity: 0.8;
+    }
+    .team.active {
+      color: #4dff4d;
+    }
     .east-round .matchup {
       border-left: none;
       border-right: 3px solid #4a9bff;
@@ -231,6 +242,30 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       margin: 8px 0;
       font-size: 12px;
     }
+    .legend {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      color: white;
+      font-size: 14px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 0 15px;
+    }
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      border-radius: 2px;
+    }
+    .legend-eliminated {
+      background-color: #ff4d4d;
+    }
+    .legend-active {
+      background-color: #4dff4d;
+    }
   </style>
 </head>
 <body>
@@ -262,6 +297,16 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
         </div>
       </div>
     </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color legend-active"></div>
+        <span>Active Teams</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color legend-eliminated"></div>
+        <span>Eliminated Teams</span>
+      </div>
+    </div>
   </div>
 </body>
 </html>`;
@@ -273,14 +318,14 @@ function generateVerticalMatchups(teams) {
     if (teams[i + 1]) {
       html += `
         <div class="matchup">
-          <span class="team">${teams[i]}</span>
+          <span class="team ${getTeamStatus(teams[i])}">${teams[i]}</span>
           <span class="vs">vs</span>
-          <span class="team">${teams[i + 1]}</span>
+          <span class="team ${getTeamStatus(teams[i + 1])}">${teams[i + 1]}</span>
         </div>`;
     } else {
       html += `
         <div class="matchup">
-          <span class="team">${teams[i]}</span>
+          <span class="team ${getTeamStatus(teams[i])}">${teams[i]}</span>
         </div>`;
     }
   }
@@ -290,10 +335,19 @@ function generateVerticalMatchups(teams) {
 function generateVerticalMatchupsFromPairs(pairs) {
   return pairs.map(([a, b]) => `
     <div class="matchup">
-      <span class="team">${a}</span>
+      <span class="team ${getTeamStatus(a)}">${a}</span>
       <span class="vs">vs</span>
-      <span class="team">${b}</span>
+      <span class="team ${getTeamStatus(b)}">${b}</span>
     </div>`).join('');
+}
+
+function getTeamStatus(team) {
+  if (eliminatedTeams.includes(team)) {
+    return 'eliminated';
+  } else if (activeTeams.includes(team)) {
+    return 'active';
+  }
+  return '';
 }
 
 module.exports = generateBracketImage;
