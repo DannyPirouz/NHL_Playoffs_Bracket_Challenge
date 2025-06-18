@@ -5,8 +5,8 @@ const path = require('path');
 const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings', 'Oilers'];
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
 
-const eliminatedTeams = ['Blues', 'Avs', 'Wild', 'Kings', 'Sens', 'Tampa', 'Habs', 'Devils'];
-const activeTeams = ['Jets', 'Stars', 'Vegas', 'Oilers', 'Leafs', 'Panthers', 'Caps', 'Canes'];
+const eliminatedTeams = ['Blues', 'Avs', 'Wild', 'Kings', 'Sens', 'Tampa', 'Habs', 'Devils', 'Vegas', 'Caps', 'Jets', 'Leafs', 'Canes', 'Stars', 'Oilers'];
+const activeTeams = ['Panthers'];
 
 const teamLogos = {
   'Jets': 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg',
