@@ -18,8 +18,8 @@ const client = new Client({
     ],
 });
 
-const uri = 'mongodb://localhost:27017';
-const clientMongo = new MongoClient(uri);
+// const uri = 'mongodb://localhost:27017';
+const clientMongo = new MongoClient(process.env.MONGO_URI);
 
 const activeCollectors = new Map();
 
