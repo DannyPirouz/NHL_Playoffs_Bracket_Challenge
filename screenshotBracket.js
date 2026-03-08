@@ -50,7 +50,10 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   const fileUrl = `file://${htmlPath.replace(/\\/g, '/')}`;
 
   // const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-  
+
+  console.log('Puppeteer executable path:', puppeteer.executablePath());
+  console.log('Cache dir:', require('puppeteer').default?.configuration?.cacheDirectory);
+
   const browser = await puppeteer.launch({
   headless: 'new',
   executablePath: puppeteer.executablePath(),
