@@ -254,7 +254,7 @@ client.on('messageCreate', async message => {
         sendNextMatchup();
     }
 
-    if (command === 'bracket') {
+    if ((command === 'bracket' || command === 'display') && args.length > 0) {
         const targetUsername = args.join(' ');
         
         if (!targetUsername) {
@@ -532,7 +532,7 @@ client.on('messageCreate', async message => {
         message.reply(response);
     }
 
-    if (command === 'display') {
+    if (command === 'display' && args.length === 0) {
         display(message);
     }
     
