@@ -49,7 +49,7 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   fs.writeFileSync(htmlPath, htmlContent);
   const fileUrl = `file://${htmlPath.replace(/\\/g, '/')}`;
 
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1200, height: 900 });
