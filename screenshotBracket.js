@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings', 'Oilers'];
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
@@ -51,12 +52,23 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
 
   // const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
+  let chromePath;
+  try {
+    const cacheDir = '/opt/render/project/src/.cache/puppeteer';
+    const result = execSync(`find ${cacheDir} -name "chrome" -type f 2>/dev/null | head -1`).toString().trim();
+    chromePath = result || puppeteer.executablePath();
+  } catch (e) {
+    chromePath = puppeteer.executablePath();
+  }
+
+  console.log('Using chrome at:', chromePath);
+
   console.log('Puppeteer executable path:', puppeteer.executablePath());
   console.log('Cache dir:', require('puppeteer').default?.configuration?.cacheDirectory);
 
   const browser = await puppeteer.launch({
   headless: 'new',
-  executablePath: puppeteer.executablePath(),
+  executablePath: chromePath,
   args: [
     '--no-sandbox',
     '--disable-setuid-sandbox',
