@@ -2,3 +2,4 @@
 node_modules/
 bracket-*.html
 bracket-*.png
+.cache
