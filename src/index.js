@@ -35,7 +35,7 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-client.once('ready', () => {
+client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}`);
 });
 
