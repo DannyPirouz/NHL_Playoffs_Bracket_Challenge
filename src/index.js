@@ -559,3 +559,9 @@ async function display(message) {
 }
 
 client.login(process.env.TOKEN);
+
+process.on("SIGTERM", () => {
+  console.log("Shutting down bot...");
+  client.destroy();
+  process.exit(0);
+});
