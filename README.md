@@ -10,12 +10,21 @@ I also introduced a points system and points will be awarded based on the correc
 Users can view their predictions as well as display their brackets with simple commands. User data gets saved and once the first match of the playoffs starts, predictions can no longer be made!
 
 
-To run the bot on your server:
-1. Paste in your bot token in the like this: client.login('Your Token')
-2. run "npm install" 
-3. run "npm install discord.js"
-4. run "npm install mongodb"
-5. run "npm install -g serve"
-6. You may need to run the bracket-renderer for the first time with "serve bracket-renderer/." if in root directory
-7. run the server with "node src/index.js"
+## To run the bot:
+
+### Requirements:
+ - Docker installed on your system
+
+1. Create a .env file in the root of the project with the following variables:
+
+TOKEN = your_discord_bot_token
+MONGO_URI = your_mongodb_connection_uri
+
+2. Build the docker image by running:
+docker build -t discord-bot .
+
+3. Run the docker container with:
+docker run discord-bot
+
+4. If there is an issue with the bracket renderer, you may need to run the it for the first time with "serve bracket-renderer/." Be in the root directory
 
