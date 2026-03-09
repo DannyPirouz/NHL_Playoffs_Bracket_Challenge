@@ -13,7 +13,7 @@ Users can view their predictions as well as display their brackets with simple c
 ## To run the bot:
 
 ### Requirements:
- - Docker installed on your system
+Docker installed on your system
 
 1. Create a .env file in the root of the project with the following variables:
 
