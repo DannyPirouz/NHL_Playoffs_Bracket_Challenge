@@ -14,7 +14,7 @@ Users can view their predictions as well as display their brackets with simple c
 
 1. Create a .env file in the root of the project with the following variables:
 
-TOKEN = your_discord_bot_token
+TOKEN = your_discord_bot_token  
 MONGO_URI = your_mongodb_connection_uri
 
 2. Build the docker image by running:
