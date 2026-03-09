@@ -12,9 +12,6 @@ Users can view their predictions as well as display their brackets with simple c
 
 ## To run the bot:
 
-### Requirements:
-Docker installed on your system
-
 1. Create a .env file in the root of the project with the following variables:
 
 TOKEN = your_discord_bot_token
@@ -27,4 +24,7 @@ docker build -t discord-bot .
 docker run discord-bot
 
 4. If there is an issue with the bracket renderer, you may need to run the it for the first time with "serve bracket-renderer/." Be in the root directory
+
+### Requirements:
+Docker installed on your system
 
