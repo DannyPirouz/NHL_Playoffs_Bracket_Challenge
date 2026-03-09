@@ -4,20 +4,6 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require('discor
 const { MongoClient } = require('mongodb');
 const generateBracketImage = require('../screenshotBracket');
 const { AttachmentBuilder } = require('discord.js');
-const https = require('https');
-
-
-const RENDER_URL = process.env.RENDER_EXTERNAL_URL; 
-
-setInterval(() => {
-  if (RENDER_URL) {
-    https.get(RENDER_URL, (res) => {
-      console.log(`Keep-alive ping: ${res.statusCode}`);
-    }).on('error', (e) => {
-      console.error('Keep-alive ping failed:', e.message);
-    });
-  }
-}, 10 * 60 * 1000); 
 
 const client = new Client({
     intents: [
