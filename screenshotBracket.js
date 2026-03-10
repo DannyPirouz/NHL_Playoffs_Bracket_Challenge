@@ -6,7 +6,6 @@ const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings',
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
 
 const eliminatedTeams = ['Blues', 'Avs', 'Wild', 'Kings', 'Sens', 'Tampa', 'Habs', 'Devils', 'Vegas', 'Caps', 'Jets', 'Leafs', 'Canes', 'Stars', 'Oilers'];
-const activeTeams = ['Panthers'];
 
 const teamLogos = {
   'Jets': 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg',
@@ -43,31 +42,29 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   const htmlContent = generateHTML(
     westernMatchups, westernR1, westernR2, westernR3,
     easternMatchups, easternR1, easternR2, easternR3,
-    predictions.round4
+    predictions.round4,
+    predictions
   );
 
   fs.writeFileSync(htmlPath, htmlContent);
   const fileUrl = `file://${htmlPath.replace(/\\/g, '/')}`;
 
   const browser = await puppeteer.launch({
-  headless: 'new',
-  executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-  args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-gpu',
-    '--single-process',        
-    '--no-zygote',             
-  ],
-});
+    headless: 'new',
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--single-process',
+      '--no-zygote',
+    ],
+  });
 
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1200, height: 900 });
-    
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-    
     await page.goto(fileUrl, { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 1000));
     const screenshotPath = path.join(__dirname, `bracket-${userId}.png`);
@@ -78,7 +75,40 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   }
 }
 
-function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, eastR3, winner) {
+function getTeamStatusForRound(team, round, predictions) {
+  const round1Teams = predictions.round1 || [];
+  const round2Teams = predictions.round2 || [];
+  const round3Teams = predictions.round3 || [];
+  const round4Winner = predictions.round4;
+
+  if (round === 1) {
+    if (round1Teams.includes(team)) return 'active';
+    if (eliminatedTeams.includes(team)) return 'eliminated';
+    return 'active';
+  }
+
+  if (round === 2) {
+    if (round2Teams.includes(team)) return 'active';
+    if (eliminatedTeams.includes(team)) return 'eliminated';
+    return 'active';
+  }
+
+  if (round === 3) {
+    if (round3Teams.includes(team)) return 'active';
+    if (eliminatedTeams.includes(team)) return 'eliminated';
+    return 'active';
+  }
+
+  if (round === 4) {
+    if (round4Winner === team) return 'active';
+    if (eliminatedTeams.includes(team)) return 'eliminated';
+    return 'active';
+  }
+  
+  return '';
+}
+
+function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, eastR3, winner, predictions) {
   let winnerHTML = '';
   if (winner) {
     const logoPath = teamLogos[winner] || null;
@@ -99,7 +129,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #0a2351; /* Dark blue background */
+      background: #0a2351;
       color: white;
       padding: 0;
       margin: 0;
@@ -140,7 +170,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       display: flex;
       justify-content: space-between;
       flex-grow: 1;
-      height: 500px; /* Fixed height for the bracket */
+      height: 500px;
     }
     .round {
       display: flex;
@@ -158,8 +188,8 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     .matchups {
       display: flex;
       flex-direction: column;
-      justify-content: space-around; /* Evenly distribute matchups */
-      height: calc(100% - 40px); /* Adjust for round title height */
+      justify-content: space-around;
+      height: calc(100% - 40px);
       padding: 10px 0;
     }
     .matchup {
@@ -180,7 +210,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       width: 100%;
     }
     .team.eliminated {
-      color: #ff4d4d; 
+      color: #ff4d4d;
       text-decoration: line-through;
       opacity: 0.8;
     }
@@ -287,10 +317,10 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       <div class="conference">
         <div class="conference-title">Western Conference</div>
         <div class="bracket">
-          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchupsFromPairs(westM)}</div></div>
-          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(westR1)}</div></div>
-          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(westR2)}</div></div>
-          <div class="round west-round"><div class="round-title">Stanley Cup Final</div><div class="matchups">${generateVerticalMatchups(westR3)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchupsFromPairs(westM, 1, predictions)}</div></div>
+          <div class="round west-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(westR1, 2, predictions)}</div></div>
+          <div class="round west-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(westR2, 3, predictions)}</div></div>
+          <div class="round west-round"><div class="round-title">Stanley Cup Final</div><div class="matchups">${generateVerticalMatchups(westR3, 4, predictions)}</div></div>
         </div>
       </div>
 
@@ -302,10 +332,10 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       <div class="conference">
         <div class="conference-title">Eastern Conference</div>
         <div class="bracket" style="flex-direction: row-reverse;">
-          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchupsFromPairs(eastM)}</div></div>
-          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(eastR1)}</div></div>
-          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(eastR2)}</div></div>
-          <div class="round east-round"><div class="round-title">Stanley Cup Final</div><div class="matchups">${generateVerticalMatchups(eastR3)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 1</div><div class="matchups">${generateVerticalMatchupsFromPairs(eastM, 1, predictions)}</div></div>
+          <div class="round east-round"><div class="round-title">Round 2</div><div class="matchups">${generateVerticalMatchups(eastR1, 2, predictions)}</div></div>
+          <div class="round east-round"><div class="round-title">Conference Final</div><div class="matchups">${generateVerticalMatchups(eastR2, 3, predictions)}</div></div>
+          <div class="round east-round"><div class="round-title">Stanley Cup Final</div><div class="matchups">${generateVerticalMatchups(eastR3, 4, predictions)}</div></div>
         </div>
       </div>
     </div>
@@ -324,42 +354,33 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
 </html>`;
 }
 
-function generateVerticalMatchups(teams) {
+function generateVerticalMatchups(teams, round, predictions) {
   let html = '';
   for (let i = 0; i < teams.length; i += 2) {
     if (teams[i + 1]) {
       html += `
         <div class="matchup">
-          <span class="team ${getTeamStatus(teams[i])}">${teams[i]}</span>
+          <span class="team ${getTeamStatusForRound(teams[i], round, predictions)}">${teams[i]}</span>
           <span class="vs">vs</span>
-          <span class="team ${getTeamStatus(teams[i + 1])}">${teams[i + 1]}</span>
+          <span class="team ${getTeamStatusForRound(teams[i + 1], round, predictions)}">${teams[i + 1]}</span>
         </div>`;
     } else {
       html += `
         <div class="matchup">
-          <span class="team ${getTeamStatus(teams[i])}">${teams[i]}</span>
+          <span class="team ${getTeamStatusForRound(teams[i], round, predictions)}">${teams[i]}</span>
         </div>`;
     }
   }
   return html;
 }
 
-function generateVerticalMatchupsFromPairs(pairs) {
+function generateVerticalMatchupsFromPairs(pairs, round, predictions) {
   return pairs.map(([a, b]) => `
     <div class="matchup">
-      <span class="team ${getTeamStatus(a)}">${a}</span>
+      <span class="team ${getTeamStatusForRound(a, round, predictions)}">${a}</span>
       <span class="vs">vs</span>
-      <span class="team ${getTeamStatus(b)}">${b}</span>
+      <span class="team ${getTeamStatusForRound(b, round, predictions)}">${b}</span>
     </div>`).join('');
-}
-
-function getTeamStatus(team) {
-  if (eliminatedTeams.includes(team)) {
-    return 'eliminated';
-  } else if (activeTeams.includes(team)) {
-    return 'active';
-  }
-  return '';
 }
 
 module.exports = generateBracketImage;
