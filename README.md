@@ -17,10 +17,10 @@ Users can view their predictions as well as display their brackets with simple c
 TOKEN = your_discord_bot_token  
 MONGO_URI = your_mongodb_connection_uri
 
-2. Build the Docker image and run the service with:
+2. Build the Docker image and run the service with:  
    docker-compose up -d --build
 
-3. If there is an issue with the bracket renderer, you may need to run the it for the first time with "serve bracket-renderer/." Be in the root directory
+4. If there is an issue with the bracket renderer, you may need to run the it for the first time with "serve bracket-renderer/." Be in the root directory
 
 ### Requirements:
 Docker is installed on your system
