@@ -5,7 +5,11 @@ const path = require('path');
 const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings', 'Oilers'];
 const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
 
-const eliminatedTeams = ['Blues', 'Avs', 'Wild', 'Kings', 'Sens', 'Tampa', 'Habs', 'Devils', 'Vegas', 'Caps', 'Jets', 'Leafs', 'Canes', 'Stars', 'Oilers'];
+
+const round1Winners = ['Canes', 'Caps', 'Panthers', 'Leafs', 'Vegas', 'Oilers', 'Stars', 'Jets'];
+const round2Winners = ['Oilers', 'Canes', 'Stars', 'Panthers'];
+const round3Winners = ['Panthers', 'Oilers'];
+const finalWinner = 'Panthers';
 
 const teamLogos = {
   'Jets': 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg',
@@ -75,36 +79,28 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
   }
 }
 
-function getTeamStatusForRound(team, round, predictions) {
-  const round1Teams = predictions.round1 || [];
-  const round2Teams = predictions.round2 || [];
-  const round3Teams = predictions.round3 || [];
-  const round4Winner = predictions.round4;
+function getTeamStatusForRound(team, round) {
 
   if (round === 1) {
-    if (round1Teams.includes(team)) return 'active';
-    if (eliminatedTeams.includes(team)) return 'eliminated';
-    return 'active';
+    if (round1Winners.length === 0) return '';
+    return round1Winners.includes(team) ? 'active' : 'eliminated';
   }
 
   if (round === 2) {
-    if (round2Teams.includes(team)) return 'active';
-    if (eliminatedTeams.includes(team)) return 'eliminated';
-    return 'active';
+    if (round2Winners.length === 0) return '';
+    return round2Winners.includes(team) ? 'active' : 'eliminated';
   }
 
   if (round === 3) {
-    if (round3Teams.includes(team)) return 'active';
-    if (eliminatedTeams.includes(team)) return 'eliminated';
-    return 'active';
+    if (round3Winners.length === 0) return '';
+    return round3Winners.includes(team) ? 'active' : 'eliminated';
   }
 
   if (round === 4) {
-    if (round4Winner === team) return 'active';
-    if (eliminatedTeams.includes(team)) return 'eliminated';
-    return 'active';
+    if (!finalWinner) return '';
+    return finalWinner === team ? 'active' : 'eliminated';
   }
-  
+
   return '';
 }
 
@@ -203,6 +199,15 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       flex-direction: column;
       align-items: center;
       text-align: center;
+    }
+    .matchup.correct {
+      border-left: 3px solid #ffd700;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+      background: rgba(255, 215, 0, 0.08);
+    }
+    .east-round .matchup.correct {
+      border-left: none;
+      border-right: 3px solid #ffd700;
     }
     .team {
       padding: 5px 0;
@@ -342,11 +347,15 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
     <div class="legend">
       <div class="legend-item">
         <div class="legend-color legend-active"></div>
-        <span>Active Teams</span>
+        <span>Advanced</span>
       </div>
       <div class="legend-item">
         <div class="legend-color legend-eliminated"></div>
-        <span>Eliminated Teams</span>
+        <span>Eliminated</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color:#ffd700;"></div>
+        <span>Correct Pick</span>
       </div>
     </div>
   </div>
@@ -354,20 +363,39 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
 </html>`;
 }
 
+function isCorrectPrediction(teamA, teamB, round, predictions) {
+  const realWinners = {
+    1: round1Winners,
+    2: round2Winners,
+    3: round3Winners,
+    4: finalWinner ? [finalWinner] : [],
+  }[round] || [];
+
+  const userPicks = round === 4
+    ? (predictions.round4 ? [predictions.round4] : [])
+    : (predictions[`round${round}`] || []);
+
+  
+  const userPickForMatchup = userPicks.find(t => t === teamA || t === teamB);
+
+  return userPickForMatchup && realWinners.includes(userPickForMatchup);
+}
+
 function generateVerticalMatchups(teams, round, predictions) {
   let html = '';
   for (let i = 0; i < teams.length; i += 2) {
     if (teams[i + 1]) {
+      const correct = isCorrectPrediction(teams[i], teams[i + 1], round, predictions);
       html += `
-        <div class="matchup">
-          <span class="team ${getTeamStatusForRound(teams[i], round, predictions)}">${teams[i]}</span>
+        <div class="matchup${correct ? ' correct' : ''}">
+          <span class="team ${getTeamStatusForRound(teams[i], round)}">${teams[i]}</span>
           <span class="vs">vs</span>
-          <span class="team ${getTeamStatusForRound(teams[i + 1], round, predictions)}">${teams[i + 1]}</span>
+          <span class="team ${getTeamStatusForRound(teams[i + 1], round)}">${teams[i + 1]}</span>
         </div>`;
     } else {
       html += `
         <div class="matchup">
-          <span class="team ${getTeamStatusForRound(teams[i], round, predictions)}">${teams[i]}</span>
+          <span class="team ${getTeamStatusForRound(teams[i], round)}">${teams[i]}</span>
         </div>`;
     }
   }
@@ -375,12 +403,15 @@ function generateVerticalMatchups(teams, round, predictions) {
 }
 
 function generateVerticalMatchupsFromPairs(pairs, round, predictions) {
-  return pairs.map(([a, b]) => `
-    <div class="matchup">
-      <span class="team ${getTeamStatusForRound(a, round, predictions)}">${a}</span>
+  return pairs.map(([a, b]) => {
+    const correct = isCorrectPrediction(a, b, round, predictions);
+    return `
+    <div class="matchup${correct ? ' correct' : ''}">
+      <span class="team ${getTeamStatusForRound(a, round)}">${a}</span>
       <span class="vs">vs</span>
-      <span class="team ${getTeamStatusForRound(b, round, predictions)}">${b}</span>
-    </div>`).join('');
+      <span class="team ${getTeamStatusForRound(b, round)}">${b}</span>
+    </div>`;
+  }).join('');
 }
 
 module.exports = generateBracketImage;
