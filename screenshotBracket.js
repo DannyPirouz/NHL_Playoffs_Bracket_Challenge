@@ -311,7 +311,7 @@ function generateHTML(westM, westR1, westR2, westR3, eastM, eastR1, eastR2, east
       background-color: #ff4d4d;
     }
     .legend-active {
-      background-color: #594dff;
+      background-color: #4dff4d;
     }
   </style>
 </head>
