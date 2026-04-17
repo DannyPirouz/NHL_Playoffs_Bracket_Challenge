@@ -370,7 +370,7 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'leaderboard') {
-        const paidUsers = ['darrell99']
+        const paidUsers = ['darrell99', 'stevechoi', 'ripkek']
         const getLeaderboard = async () => {
             const leaderboardData = [];
             const userPromises = [];
