@@ -253,6 +253,33 @@ client.on('messageCreate', async message => {
         sendNextMatchup();
     }
 
+    if (command === 'tiebreaker') {
+        const userId = message.author.id;
+
+        if (!predictions[userId] || !predictions[userId].round1) {
+            message.reply('You need to make your bracket predictions first using `!predict` before submitting a tiebreaker.');
+            return;
+        }
+
+        const prompt = await message.channel.send(`🏒 **Tiebreaker** — ${message.author.username}, how many total goals do you think will be scored in the Stanley Cup Finals? Type your number below:`);
+
+        const filter = m => m.author.id === userId && !isNaN(m.content.trim());
+
+        message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] })
+            .then(async collected => {
+                const totalGoals = parseInt(collected.first().content.trim());
+                predictions[userId].tiebreaker = totalGoals;
+                await savePredictions();
+                await prompt.delete().catch(() => {});
+                await collected.first().delete().catch(() => {});
+                message.reply(`✅ Tiebreaker saved! You predicted **${totalGoals}** total goals in the Stanley Cup Finals.`);
+            })
+            .catch(async () => {
+                await prompt.delete().catch(() => {});
+                message.reply('⏰ Tiebreaker timed out. Run `!tiebreaker` again to submit your guess.');
+            });
+    }
+
     if ((command === 'bracket' || command === 'display') && args.length > 0) {
         const targetUsername = args.join(' ');
         
@@ -381,6 +408,7 @@ client.on('messageCreate', async message => {
                 const pointsData = calculateUserPoints(userPrediction);
                 let user = client.users.cache.get(userId);
                 let userChampionPick = userPrediction.round4;
+                let userTiebreaker = userPrediction.tiebreaker !== undefined ? userPrediction.tiebreaker : 'N/A';
                 
                 if (!user) {
                     userPromises.push(
@@ -391,6 +419,7 @@ client.on('messageCreate', async message => {
                                     username: fetchedUser.username,
                                     userId,
                                     userChampionPick,
+                                    userTiebreaker,
                                     ...pointsData
                                 });
                             })
@@ -399,6 +428,7 @@ client.on('messageCreate', async message => {
                                     username: `Unknown User`,
                                     userId,
                                     userChampionPick,
+                                    userTiebreaker,
                                     ...pointsData
                                 });
                             })
@@ -409,6 +439,7 @@ client.on('messageCreate', async message => {
                         username: user.username,
                         userId,
                         userChampionPick,
+                        userTiebreaker,
                         ...pointsData
                     });
                 }
@@ -445,7 +476,8 @@ client.on('messageCreate', async message => {
                 
                     leaderboardText += `${paidMedal}` + `${medal} **${userData.username}**: **${userData.totalPoints} pts** ` +
                         `(R1: ${userData.round1Points}, R2: ${userData.round2Points}, ` +
-                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})   ` + `Champ Pick: **${userData.userChampionPick.toUpperCase()}** \n` + '\n';
+                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})   ` + `Champ Pick: **${userData.userChampionPick.toUpperCase()}**   \n` +
+                        `Total Goals in Stanley Cup Finals: **${userData.userTiebreaker}**\n` + '\n';
                 });
                 
                 embed.addFields({ name: 'Rankings', value: leaderboardText });
