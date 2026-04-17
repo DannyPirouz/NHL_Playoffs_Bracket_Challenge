@@ -40,8 +40,8 @@ client.once(Events.ClientReady, () => {
 
 const prefix = '!';
 
-const round1Matchups = [['Jets', 'Blues'], ['Stars', 'Avs'], ['Vegas', 'Wild'], ['Kings', 'Oilers'],
-['Leafs', 'Sens'], ['Tampa', 'Panthers'], ['Caps', 'Habs'], ['Canes', 'Devils']];
+const round1Matchups = [['Avs', 'Kings'], ['Stars', 'Wild'], ['Vegas', 'Mammoth'], ['Oilers', 'Ducks'],
+['Sabres', 'Bruins'], ['Tampa', 'Habs'], ['Canes', 'Sens'], ['Pens', 'Flyers']];
 
 let predictions = {};
 
@@ -83,10 +83,10 @@ function calculateUserPoints(userPrediction) {
         };
     }
 
-    const round1Winners = ["Canes", "Caps", "Panthers", "Leafs", "Vegas", "Oilers", "Stars", "Jets"];
-    const round2Winners = ["Oilers", "Canes", "Stars", "Panthers"];
-    const round3Winners = ["Panthers", "Oilers"];
-    const finalWinner = "Panthers";
+    const round1Winners = [];
+    const round2Winners = [];
+    const round3Winners = [];
+    const finalWinner = "";
     
     let round1Points = 0;
     let round2Points = 0;
@@ -370,7 +370,7 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'leaderboard') {
-        const paidUsers = ['darrell99', 'jrg', 'supsoup', 'tobi.36', 'stevechoi', 'canucksfan233', 'boby1699', 'b2water', 'stickycoom', 'ripkek', 'chris30000']
+        const paidUsers = ['darrell99']
         const getLeaderboard = async () => {
             const leaderboardData = [];
             const userPromises = [];
@@ -497,14 +497,14 @@ client.on('messageCreate', async message => {
         }
         let response = 'Your predictions for Round 1: \n' +
             `\`\`\`yaml\n` +
-            `Jets vs Blues      : ${userPrediction.round1[0].toUpperCase()}\n` +
-            `Stars vs Avs       : ${userPrediction.round1[1].toUpperCase()}\n` +
-            `Vegas vs Wild      : ${userPrediction.round1[2].toUpperCase()}\n` +
-            `Kings vs Oilers    : ${userPrediction.round1[3].toUpperCase()}\n` +
-            `Leafs vs Sens      : ${userPrediction.round1[4].toUpperCase()}\n` +
-            `Tampa vs Panthers  : ${userPrediction.round1[5].toUpperCase()}\n` +
-            `Caps vs Habs       : ${userPrediction.round1[6].toUpperCase()}\n` +
-            `Canes vs Devils    : ${userPrediction.round1[7].toUpperCase()}\n` +
+            `Avs vs Kings      : ${userPrediction.round1[0].toUpperCase()}\n` +
+            `Stars vs Wild       : ${userPrediction.round1[1].toUpperCase()}\n` +
+            `Vegas vs Mammoth      : ${userPrediction.round1[2].toUpperCase()}\n` +
+            `Oilers vs Ducks    : ${userPrediction.round1[3].toUpperCase()}\n` +
+            `Sabres vs Bruins      : ${userPrediction.round1[4].toUpperCase()}\n` +
+            `Tampa vs Habs  : ${userPrediction.round1[5].toUpperCase()}\n` +
+            `Canes vs Sens       : ${userPrediction.round1[6].toUpperCase()}\n` +
+            `Pens vs Flyers    : ${userPrediction.round1[7].toUpperCase()}\n` +
             `\`\`\``;
 
         if (userPrediction.round2) {

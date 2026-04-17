@@ -2,32 +2,32 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-const westernTeams = ['Jets', 'Blues', 'Stars', 'Avs', 'Vegas', 'Wild', 'Kings', 'Oilers'];
-const easternTeams = ['Leafs', 'Sens', 'Tampa', 'Panthers', 'Caps', 'Habs', 'Canes', 'Devils'];
+const westernTeams = ['Avs', 'Stars', 'Wild', 'Mammoth', 'Vegas', 'Oilers', 'Ducks', 'Kings'];
+const easternTeams = ['Sabres', 'Tampa', 'Habs', 'Bruins', 'Canes', 'Pens', 'Flyers', 'Sens'];
 
 
-const round1Winners = ['Canes', 'Caps', 'Panthers', 'Leafs', 'Vegas', 'Oilers', 'Stars', 'Jets'];
-const round2Winners = ['Oilers', 'Canes', 'Stars', 'Panthers'];
-const round3Winners = ['Panthers', 'Oilers'];
-const finalWinner = 'Panthers';
+const round1Winners = [];
+const round2Winners = [];
+const round3Winners = [];
+const finalWinner = '';
 
 const teamLogos = {
-  'Jets': 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg',
-  'Blues': 'https://assets.nhle.com/logos/nhl/svg/STL_light.svg',
+  'Mammoth': 'https://assets.nhle.com/logos/nhl/svg/UTA_light.svg',
+  'Ducks': 'https://assets.nhle.com/logos/nhl/svg/ANA_light.svg',
   'Stars': 'https://assets.nhle.com/logos/nhl/svg/DAL_light.svg',
   'Avs': 'https://assets.nhle.com/logos/nhl/svg/COL_light.svg',
   'Vegas': 'https://assets.nhle.com/logos/nhl/svg/VGK_light.svg',
   'Wild': 'https://assets.nhle.com/logos/nhl/svg/MIN_light.svg',
   'Kings': 'https://assets.nhle.com/logos/nhl/svg/LAK_light.svg',
   'Oilers': 'https://assets.nhle.com/logos/nhl/svg/EDM_light.svg',
-  'Leafs': 'https://assets.nhle.com/logos/nhl/svg/TOR_light.svg',
+  'Sabres': 'https://assets.nhle.com/logos/nhl/svg/BUF_light.svg',
   'Sens': 'https://assets.nhle.com/logos/nhl/svg/OTT_light.svg',
   'Tampa': 'https://assets.nhle.com/logos/nhl/svg/TBL_light.svg',
-  'Panthers': 'https://assets.nhle.com/logos/nhl/svg/FLA_light.svg',
-  'Caps': 'https://assets.nhle.com/logos/nhl/svg/WSH_light.svg',
+  'Bruins': 'https://assets.nhle.com/logos/nhl/svg/BOS_light.svg',
+  'Flyers': 'https://assets.nhle.com/logos/nhl/svg/PHI_light.svg',
   'Habs': 'https://assets.nhle.com/logos/nhl/svg/MTL_light.svg',
   'Canes': 'https://assets.nhle.com/logos/nhl/svg/CAR_light.svg',
-  'Devils': 'https://assets.nhle.com/logos/nhl/svg/NJD_light.svg'
+  'Pens': 'https://assets.nhle.com/logos/nhl/svg/PIT_light.svg'
 };
 
 async function generateBracketImage(predictions, userId, fullRound1Matchups) {
