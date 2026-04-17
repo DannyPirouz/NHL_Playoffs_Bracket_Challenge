@@ -477,7 +477,7 @@ client.on('messageCreate', async message => {
                     leaderboardText += `${paidMedal}` + `${medal} **${userData.username}**: **${userData.totalPoints} pts** ` +
                         `(R1: ${userData.round1Points}, R2: ${userData.round2Points}, ` +
                         `R3: ${userData.round3Points}, Final: ${userData.round4Points})   ` + `Champ Pick: **${userData.userChampionPick.toUpperCase()}**   \n` +
-                        `Total Goals in Stanley Cup Finals: **${userData.userTiebreaker}**\n` + '\n';
+                        `Total Goals in Finals: **${userData.userTiebreaker}**\n` + '\n';
                 });
                 
                 embed.addFields({ name: 'Rankings', value: leaderboardText });
