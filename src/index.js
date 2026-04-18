@@ -464,9 +464,7 @@ client.on('messageCreate', async message => {
             if (topUsers.length === 0) {
                 embed.addFields({ name: 'No predictions', value: 'No users have made predictions yet!' });
             } else {
-                let leaderboardText = '';
-                
-                topUsers.forEach((userData, index) => {
+                const lines = topUsers.map((userData, index) => {
                     let paidMedal;
                     const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
                     if (paidUsers.includes(userData.username)) {
@@ -474,14 +472,26 @@ client.on('messageCreate', async message => {
                     } else {
                         paidMedal = '❌ ';
                     }
-                
-                    leaderboardText += `${paidMedal}` + `${medal} **${userData.username}**: **${userData.totalPoints} pts** ` +
+                    return `${paidMedal}${medal} **${userData.username}**: **${userData.totalPoints} pts** ` +
                         `(R1: ${userData.round1Points}, R2: ${userData.round2Points}, ` +
-                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})   ` + `Champ Pick: **${userData.userChampionPick.toUpperCase()}**   \n` +
-                        `Total Goals in Finals: **${userData.userTiebreaker}**\n` + '\n';
+                        `R3: ${userData.round3Points}, Final: ${userData.round4Points})   ` +
+                        `Champ Pick: **${userData.userChampionPick.toUpperCase()}**   \n` +
+                        `Total Goals in Finals: **${userData.userTiebreaker}**\n \n`;
                 });
-                
-                embed.addFields({ name: 'Rankings', value: leaderboardText });
+
+                let chunk = '';
+                let chunkIndex = 0;
+                for (const line of lines) {
+                    if (chunk.length + line.length > 1024) {
+                        embed.addFields({ name: chunkIndex === 0 ? 'Rankings' : '\u200b', value: chunk });
+                        chunk = '';
+                        chunkIndex++;
+                    }
+                    chunk += line;
+                }
+                if (chunk.length > 0) {
+                    embed.addFields({ name: chunkIndex === 0 ? 'Rankings' : '\u200b', value: chunk });
+                }
             }
             
             const currentUserIndex = leaderboardData.findIndex(data => data.userId === message.author.id);
