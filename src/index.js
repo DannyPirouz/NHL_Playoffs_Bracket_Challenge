@@ -142,10 +142,10 @@ client.on('messageCreate', async message => {
     if (command === 'predict') {
 
         let currentDate = new Date();
-        if ((currentDate.getMonth() == 3 && currentDate.getDate() >= 19) || currentDate.getMonth() > 3) {
-            message.reply('Predictions are closed!');
-            return;
-        }
+        // if ((currentDate.getMonth() == 3 && currentDate.getDate() >= 19) || currentDate.getMonth() > 3) {
+        //     message.reply('Predictions are closed!');
+        //     return;
+        // }
         
         let botMessages = [];
         const userId = message.author.id;
