@@ -397,7 +397,7 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'leaderboard') {
-        const paidUsers = ['darrell99', 'stevechoi', 'ripkek', 'canucksfan233', 'b2water']
+        const paidUsers = ['darrell99', 'stevechoi', 'ripkek', 'canucksfan233', 'b2water', 'supsoup']
         const getLeaderboard = async () => {
             await loadPredictions();
             const leaderboardData = [];
