@@ -142,10 +142,10 @@ client.on('messageCreate', async message => {
     if (command === 'predict') {
 
         let currentDate = new Date();
-        // if ((currentDate.getMonth() == 3 && currentDate.getDate() >= 19) || currentDate.getMonth() > 3) {
-        //     message.reply('Predictions are closed!');
-        //     return;
-        // }
+        if ((currentDate.getMonth() == 3 && currentDate.getDate() >= 19) || currentDate.getMonth() > 3) {
+            message.reply('Predictions are closed!');
+            return;
+        }
         
         let botMessages = [];
         const userId = message.author.id;
@@ -397,7 +397,7 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'leaderboard') {
-        const paidUsers = ['darrell99', 'stevechoi', 'ripkek', 'canucksfan233', 'b2water', 'supsoup', 'tobi.36']
+        const paidUsers = ['darrell99', 'stevechoi', 'ripkek', 'canucksfan233', 'b2water', 'supsoup', 'tobi.36', 'stickycoom']
         const getLeaderboard = async () => {
             await loadPredictions();
             const leaderboardData = [];
