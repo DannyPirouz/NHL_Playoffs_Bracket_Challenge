@@ -5,7 +5,7 @@ const path = require('path');
 const westernTeams = ['Avs', 'Stars', 'Wild', 'Mammoth', 'Vegas', 'Oilers', 'Ducks', 'Kings'];
 const easternTeams = ['Sabres', 'Tampa', 'Habs', 'Bruins', 'Canes', 'Pens', 'Flyers', 'Sens'];
 
-
+const eliminated = ['Sens'];
 const round1Winners = ['Canes'];
 const round2Winners = [];
 const round3Winners = [];
@@ -82,8 +82,15 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
 function getTeamStatusForRound(team, round) {
 
   if (round === 1) {
-    if (round1Winners.length === 0) return '';
-    return round1Winners.includes(team) ? 'active' : 'eliminated';
+    if (round1Winners.length === 0) {
+      return '';
+    } else if (round1Winners.includes(team)) {
+      return 'active';
+    } else if (eliminated.includes(team)) {
+      return 'eliminated';
+    } else {
+      return '';
+    }
   }
 
   if (round === 2) {
