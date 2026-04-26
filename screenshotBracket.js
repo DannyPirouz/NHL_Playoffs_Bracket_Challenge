@@ -6,7 +6,7 @@ const westernTeams = ['Avs', 'Stars', 'Wild', 'Mammoth', 'Vegas', 'Oilers', 'Duc
 const easternTeams = ['Sabres', 'Tampa', 'Habs', 'Bruins', 'Canes', 'Pens', 'Flyers', 'Sens'];
 
 
-const round1Winners = [];
+const round1Winners = ['Canes'];
 const round2Winners = [];
 const round3Winners = [];
 const finalWinner = '';
