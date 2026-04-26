@@ -82,30 +82,31 @@ async function generateBracketImage(predictions, userId, fullRound1Matchups) {
 function getTeamStatusForRound(team, round) {
 
   if (round === 1) {
-    if (round1Winners.length === 0) {
-      return '';
-    } else if (round1Winners.includes(team)) {
-      return 'active';
-    } else if (eliminated.includes(team)) {
-      return 'eliminated';
-    } else {
-      return '';
-    }
+    if (round1Winners.length === 0) return '';
+    if (round1Winners.includes(team)) return 'active';
+    if (eliminated.includes(team)) return 'eliminated';
+    return '';
   }
 
   if (round === 2) {
     if (round2Winners.length === 0) return '';
-    return round2Winners.includes(team) ? 'active' : 'eliminated';
+    if (round2Winners.includes(team)) return 'active';
+    if (eliminated.includes(team)) return 'eliminated';
+    return '';
   }
 
   if (round === 3) {
     if (round3Winners.length === 0) return '';
-    return round3Winners.includes(team) ? 'active' : 'eliminated';
+    if (round3Winners.includes(team)) return 'active';
+    if (eliminated.includes(team)) return 'eliminated';
+    return '';
   }
 
   if (round === 4) {
     if (!finalWinner) return '';
-    return finalWinner === team ? 'active' : 'eliminated';
+    if (finalWinner.includes(team)) return 'active';
+    if (eliminated.includes(team)) return 'eliminated';
+    return '';
   }
 
   return '';
