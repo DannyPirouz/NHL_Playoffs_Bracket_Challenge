@@ -5,8 +5,8 @@ const path = require('path');
 const westernTeams = ['Avs', 'Stars', 'Wild', 'Mammoth', 'Vegas', 'Oilers', 'Ducks', 'Kings'];
 const easternTeams = ['Sabres', 'Tampa', 'Habs', 'Bruins', 'Canes', 'Pens', 'Flyers', 'Sens'];
 
-const eliminated = ['Sens'];
-const round1Winners = ['Canes'];
+const eliminated = ['Sens', 'Kings'];
+const round1Winners = ['Canes', 'Avs'];
 const round2Winners = [];
 const round3Winners = [];
 const finalWinner = '';

@@ -83,7 +83,7 @@ function calculateUserPoints(userPrediction) {
         };
     }
 
-    const round1Winners = ['Canes'];
+    const round1Winners = ['Canes', 'Avs'];
     const round2Winners = [];
     const round3Winners = [];
     const finalWinner = "";
