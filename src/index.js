@@ -83,7 +83,7 @@ function calculateUserPoints(userPrediction) {
         };
     }
 
-    const round1Winners = ['Canes', 'Avs', 'Flyers', 'Wild', 'Ducks', 'Sabres'];
+    const round1Winners = ['Canes', 'Avs', 'Flyers', 'Wild', 'Ducks', 'Sabres', 'Vegas'];
     const round2Winners = [];
     const round3Winners = [];
     const finalWinner = "";
