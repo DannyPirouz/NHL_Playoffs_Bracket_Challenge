@@ -84,7 +84,7 @@ function calculateUserPoints(userPrediction) {
     }
 
     const round1Winners = ['Canes', 'Avs', 'Flyers', 'Wild', 'Ducks', 'Sabres', 'Vegas', 'Habs'];
-    const round2Winners = ['Canes', 'Avs'];
+    const round2Winners = ['Canes', 'Avs', 'Vegas'];
     const round3Winners = [];
     const finalWinner = "";
     
